@@ -1,0 +1,247 @@
+2019-04-22 16:44:04,560:INFO:__main__:<module>:Program started directly
+2019-04-22 16:44:04,565:DEBUG:__main__:main:main interface
+2019-04-22 16:44:06,557:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:44:06,599:DEBUG:__main__:reg:registration process started
+2019-04-22 16:44:09,661:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:44:11,581:DEBUG:__main__:check_usr:checking username availability
+2019-04-22 16:44:11,581:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:44:11,593:DEBUG:__main__:reg:registration username valid
+2019-04-22 16:44:11,593:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:44:14,768:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:44:19,010:DEBUG:__main__:reg:password match confirmed
+2019-04-22 16:44:19,010:DEBUG:__main__:check_pword:checking password requirements
+2019-04-22 16:44:19,010:DEBUG:__main__:check_pword:pass requirements met
+2019-04-22 16:44:19,010:DEBUG:__main__:reg:password requirements confirmed
+2019-04-22 16:44:19,012:DEBUG:__main__:file_register:adding user to database - usr: koumakpet ; pwd: 567ca6093ffd6e77f3c8910a4100f89b1b812548abfcc3577e31c8ed
+2019-04-22 16:44:19,012:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:44:19,015:CRITICAL:__main__:<module>:Program Failed: table users has 2 columns but 3 values were supplied
+2019-04-22 16:45:31,390:INFO:__main__:<module>:Program started directly
+2019-04-22 16:45:31,390:DEBUG:__main__:main:main interface
+2019-04-22 16:45:33,417:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:45:33,470:DEBUG:__main__:reg:registration process started
+2019-04-22 16:45:37,672:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:45:39,664:DEBUG:__main__:check_usr:checking username availability
+2019-04-22 16:45:39,664:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:45:39,664:WARNING:__main__:create_database_tables:Database does not exists, creating new database
+2019-04-22 16:45:39,699:DEBUG:__main__:reg:registration username valid
+2019-04-22 16:45:39,699:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:45:42,723:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:45:45,234:DEBUG:__main__:reg:password match confirmed
+2019-04-22 16:45:45,234:DEBUG:__main__:check_pword:checking password requirements
+2019-04-22 16:45:45,234:DEBUG:__main__:check_pword:pass requirements met
+2019-04-22 16:45:45,234:DEBUG:__main__:reg:password requirements confirmed
+2019-04-22 16:45:45,234:DEBUG:__main__:file_register:adding user to database - usr: koumakpet ; pwd: 567ca6093ffd6e77f3c8910a4100f89b1b812548abfcc3577e31c8ed
+2019-04-22 16:45:45,234:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:45:45,252:INFO:__main__:reg:Registered new user, name: koumakpet
+2019-04-22 16:45:47,556:DEBUG:__main__:main:main interface
+2019-04-22 16:45:48,751:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:45:48,798:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:46:10,140:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:46:12,805:DEBUG:__main__:verify:verifying username and password for logging-in
+2019-04-22 16:46:12,805:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:46:12,807:DEBUG:__main__:verify:user verification confirmed
+2019-04-22 16:46:12,807:DEBUG:__main__:log:user information confirmed, user exists
+2019-04-22 16:46:14,776:DEBUG:__main__:logged_in:Logged koumakpet
+2019-04-22 16:46:14,777:DEBUG:__main__:get_pass:finding password for koumakpet
+2019-04-22 16:46:14,780:DEBUG:__main__:get_mail:finding email for koumakpet
+2019-04-22 16:46:51,235:INFO:__main__:<module>:Program started directly
+2019-04-22 16:46:51,235:DEBUG:__main__:main:main interface
+2019-04-22 16:46:52,368:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:46:52,428:DEBUG:__main__:reg:registration process started
+2019-04-22 16:46:54,489:DEBUG:__main__:reg:registration aborted
+2019-04-22 16:46:54,489:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:48:54,156:INFO:__main__:<module>:Program started directly
+2019-04-22 16:48:54,157:DEBUG:__main__:main:main interface
+2019-04-22 16:48:55,949:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:48:55,995:DEBUG:__main__:reg:registration process started
+2019-04-22 16:48:56,828:DEBUG:__main__:reg:registration aborted
+2019-04-22 16:48:56,828:DEBUG:__main__:main:main interface
+2019-04-22 16:49:00,606:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:49:00,653:DEBUG:__main__:reg:registration process started
+2019-04-22 16:49:07,488:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:49:07,488:DEBUG:__main__:reg:registration email format invalid
+2019-04-22 16:49:11,008:DEBUG:__main__:reg:registration process started
+2019-04-22 16:49:16,703:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:49:22,821:DEBUG:__main__:check_usr:checking username availability
+2019-04-22 16:49:22,821:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:49:22,823:DEBUG:__main__:check_usr:username taken
+2019-04-22 16:49:22,823:DEBUG:__main__:reg:registration username invalid (taken)
+2019-04-22 16:49:26,450:DEBUG:__main__:reg:registration process started
+2019-04-22 16:49:28,956:DEBUG:__main__:reg:registration aborted
+2019-04-22 16:49:28,956:DEBUG:__main__:main:main interface
+2019-04-22 16:49:30,365:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:49:30,425:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:49:35,405:DEBUG:__main__:log:logging-in aborted
+2019-04-22 16:49:35,405:DEBUG:__main__:main:main interface
+2019-04-22 16:49:36,936:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:49:36,987:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:49:39,921:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:49:44,351:DEBUG:__main__:verify:verifying username and password for logging-in
+2019-04-22 16:49:44,351:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:49:44,353:DEBUG:__main__:verify:user verification confirmed
+2019-04-22 16:49:44,353:DEBUG:__main__:log:user information confirmed, user exists
+2019-04-22 16:49:45,109:DEBUG:__main__:logged_in:Logged koumakpet
+2019-04-22 16:49:45,109:DEBUG:__main__:get_pass:finding password for koumakpet
+2019-04-22 16:49:45,111:DEBUG:__main__:get_mail:finding email for koumakpet
+2019-04-22 16:49:45,113:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:50:32,884:INFO:__main__:<module>:Program started directly
+2019-04-22 16:50:32,884:DEBUG:__main__:main:main interface
+2019-04-22 16:52:48,659:INFO:__main__:<module>:Program started directly
+2019-04-22 16:52:48,659:DEBUG:__main__:main:main interface
+2019-04-22 16:52:51,432:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:52:51,478:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:53:10,210:INFO:__main__:<module>:Program started directly
+2019-04-22 16:53:10,211:DEBUG:__main__:main:main interface
+2019-04-22 16:53:11,959:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:53:12,007:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:53:13,720:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:53:17,100:DEBUG:__main__:verify:verifying username and password for logging-in
+2019-04-22 16:53:17,101:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:53:17,104:DEBUG:__main__:verify:user verification confirmed
+2019-04-22 16:53:17,104:DEBUG:__main__:log:user information confirmed, user exists
+2019-04-22 16:53:18,892:DEBUG:__main__:logged_in:Logged koumakpet
+2019-04-22 16:53:18,893:DEBUG:__main__:get_pass:finding password for koumakpet
+2019-04-22 16:53:18,894:DEBUG:__main__:get_mail:finding email for koumakpet
+2019-04-22 16:55:51,480:DEBUG:__main__:verify:verifying username and password for logging-in
+2019-04-22 16:55:51,481:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:55:51,483:DEBUG:__main__:verify:user verification failed
+2019-04-22 16:55:51,483:DEBUG:__main__:log:username or password incorrect
+2019-04-22 16:56:52,898:INFO:__main__:<module>:Program started directly
+2019-04-22 16:56:52,898:DEBUG:__main__:main:main interface
+2019-04-22 16:56:54,944:DEBUG:__main__:main:choice: register (y)
+2019-04-22 16:56:54,991:DEBUG:__main__:reg:registration process started
+2019-04-22 16:56:59,880:DEBUG:__main__:check_mail:checking email format
+2019-04-22 16:57:01,442:DEBUG:__main__:check_usr:checking username availability
+2019-04-22 16:57:01,442:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:57:01,445:DEBUG:__main__:reg:registration username valid
+2019-04-22 16:57:01,445:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:57:07,918:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:57:10,417:DEBUG:__main__:reg:password match confirmed
+2019-04-22 16:57:10,418:DEBUG:__main__:check_pword:checking password requirements
+2019-04-22 16:57:10,418:DEBUG:__main__:check_pword:pass requirements met
+2019-04-22 16:57:10,418:DEBUG:__main__:reg:password requirements confirmed
+2019-04-22 16:57:10,418:DEBUG:__main__:file_register:adding user to database - usr: kelo ; pwd: 9ecfad5f45bf0e41cf23ac6f17cae67732ec1a7719fd0e3e384f4b52
+2019-04-22 16:57:10,418:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:57:10,434:INFO:__main__:reg:Registered new user, name: kelo
+2019-04-22 16:57:11,705:DEBUG:__main__:main:main interface
+2019-04-22 16:57:12,887:DEBUG:__main__:main:choice: login (n)
+2019-04-22 16:57:12,934:DEBUG:__main__:log:logging-in process started
+2019-04-22 16:57:14,262:DEBUG:__main__:win_getpass:using getpass to hide password input
+2019-04-22 16:57:17,404:DEBUG:__main__:verify:verifying username and password for logging-in
+2019-04-22 16:57:17,404:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-04-22 16:57:17,406:DEBUG:__main__:verify:user verification confirmed
+2019-04-22 16:57:17,407:DEBUG:__main__:log:user information confirmed, user exists
+2019-04-22 16:57:18,335:DEBUG:__main__:logged_in:Logged kelo
+2019-04-22 16:57:18,336:DEBUG:__main__:get_pass:finding password for kelo
+2019-04-22 16:57:18,337:DEBUG:__main__:get_mail:finding email for kelo
+2019-04-22 17:12:22,900:INFO:__main__:<module>:Program started directly
+2019-04-22 17:12:26,421:INFO:__main__:main:choice: register (y)
+2019-04-22 17:12:55,252:INFO:__main__:reg:Registered new user, name: masradlulko
+2019-04-22 17:13:01,934:INFO:__main__:main:choice: login (n)
+2019-04-22 17:18:39,144:INFO:__main__:<module>:Program started directly
+2019-04-22 17:19:20,310:INFO:__main__:<module>:Program started directly
+2019-04-22 17:19:21,297:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:19:21,300:CRITICAL:__main__:<module>:Program Failed: no such table: email
+2019-04-22 17:19:59,604:INFO:__main__:<module>:Program started directly
+2019-04-22 17:20:00,264:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:20:00,269:CRITICAL:__main__:<module>:Program Failed: 'sqlite3.Cursor' object has no attribute 'commit'
+2019-04-22 17:20:13,777:INFO:__main__:<module>:Program started directly
+2019-04-22 17:20:15,521:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:20:32,061:INFO:__main__:<module>:Program started directly
+2019-04-22 17:20:35,306:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:21:40,469:INFO:__main__:<module>:Program started directly
+2019-04-22 17:21:57,675:INFO:__main__:<module>:Program started directly
+2019-04-22 17:22:00,692:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:22:01,764:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:22:18,245:INFO:__main__:<module>:Program started directly
+2019-04-22 17:22:20,052:INFO:__main__:get_database_tables:Accessing all database tables
+2019-04-22 17:22:28,062:INFO:__main__:main:choice: login (n)
+2019-04-22 17:22:36,839:INFO:__main__:log:user %s logged.
+2019-04-26 10:30:51,298:INFO:__main__:<module>:Program started directly
+2019-06-07 08:43:29,640:INFO:__main__:<module>:Program started directly
+2019-06-07 08:43:29,641:DEBUG:__main__:main:main interface
+2019-06-07 08:43:32,604:INFO:__main__:main:choice: register (y)
+2019-06-07 08:43:32,653:DEBUG:__main__:reg:registration process started
+2019-06-07 08:43:43,247:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:43:44,839:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:43:44,839:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:43:44,841:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:43:44,848:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:43:44,848:CRITICAL:__main__:<module>:Program Failed: name 'win_getpass' is not defined
+2019-06-07 08:44:10,580:INFO:__main__:<module>:Program started directly
+2019-06-07 08:44:10,580:DEBUG:__main__:main:main interface
+2019-06-07 08:44:11,829:INFO:__main__:main:choice: register (y)
+2019-06-07 08:44:11,875:DEBUG:__main__:reg:registration process started
+2019-06-07 08:44:19,700:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:44:21,332:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:44:21,332:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:44:21,332:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:44:21,334:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:44:21,334:CRITICAL:__main__:<module>:Program Failed: get_pword() takes 0 positional arguments but 1 was given
+2019-06-07 08:46:55,353:INFO:__main__:<module>:Program started directly
+2019-06-07 08:46:55,354:DEBUG:__main__:main:main interface
+2019-06-07 08:47:00,933:INFO:__main__:main:choice: register (y)
+2019-06-07 08:47:00,979:DEBUG:__main__:reg:registration process started
+2019-06-07 08:47:06,654:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:47:10,125:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:47:10,125:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:47:10,126:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:47:10,127:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:47:10,127:CRITICAL:__main__:<module>:Program Failed: name 'pword_module' is not defined
+2019-06-07 08:48:41,385:INFO:__main__:<module>:Program started directly
+2019-06-07 08:48:41,385:DEBUG:__main__:main:main interface
+2019-06-07 08:48:42,854:INFO:__main__:main:choice: register (y)
+2019-06-07 08:48:42,903:DEBUG:__main__:reg:registration process started
+2019-06-07 08:48:46,856:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:48:47,943:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:48:47,943:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:48:47,943:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:48:47,945:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:48:47,945:CRITICAL:__main__:<module>:Program Failed: get_pword() takes 0 positional arguments but 1 was given
+2019-06-07 08:51:00,433:INFO:__main__:<module>:Program started directly
+2019-06-07 08:51:00,434:DEBUG:__main__:main:main interface
+2019-06-07 08:51:02,972:INFO:__main__:main:choice: register (y)
+2019-06-07 08:51:03,020:DEBUG:__main__:reg:registration process started
+2019-06-07 08:51:08,706:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:51:28,710:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:51:28,710:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:51:28,711:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:51:28,713:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:51:28,713:CRITICAL:__main__:<module>:Program Failed: get_pword() takes 0 positional arguments but 1 was given
+2019-06-07 08:52:50,837:INFO:__main__:<module>:Program started directly
+2019-06-07 08:52:50,837:DEBUG:__main__:main:main interface
+2019-06-07 08:52:52,138:INFO:__main__:main:choice: register (y)
+2019-06-07 08:52:52,186:DEBUG:__main__:reg:registration process started
+2019-06-07 08:52:59,589:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:53:00,191:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:53:00,191:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:53:00,192:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:53:00,194:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:54:47,819:INFO:__main__:<module>:Program started directly
+2019-06-07 08:54:47,819:DEBUG:__main__:main:main interface
+2019-06-07 08:54:49,041:INFO:__main__:main:choice: register (y)
+2019-06-07 08:54:49,087:DEBUG:__main__:reg:registration process started
+2019-06-07 08:54:52,926:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:54:53,850:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:54:53,850:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:54:53,851:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:54:53,852:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:55:32,917:INFO:__main__:<module>:Program started directly
+2019-06-07 08:55:32,917:DEBUG:__main__:main:main interface
+2019-06-07 08:55:34,212:INFO:__main__:main:choice: register (y)
+2019-06-07 08:55:34,257:DEBUG:__main__:reg:registration process started
+2019-06-07 08:55:38,554:DEBUG:__main__:check_mail:checking email format
+2019-06-07 08:55:39,623:DEBUG:__main__:check_usr:checking username availability
+2019-06-07 08:55:39,624:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:55:39,624:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:55:39,626:DEBUG:__main__:reg:registration username valid
+2019-06-07 08:55:54,432:DEBUG:__main__:reg:password match confirmed
+2019-06-07 08:55:54,432:DEBUG:__main__:check_pword:checking password requirements
+2019-06-07 08:55:54,432:DEBUG:__main__:check_pword:pass requirements met
+2019-06-07 08:55:54,432:DEBUG:__main__:reg:password requirements confirmed
+2019-06-07 08:55:54,436:DEBUG:__main__:file_register:adding user to database - mail: test@test.tst ; usr: k ; enc_pwd: 17ec11a26b1f5a1481eed7a7da36865e3c70318e50065dbc506d9d24
+2019-06-07 08:55:54,436:DEBUG:__main__:create_database_tables:Checking if database tables exists
+2019-06-07 08:55:54,436:DEBUG:__main__:create_database_tables:Database exists.
+2019-06-07 08:55:54,443:DEBUG:__main__:file_register:user added successfully
+2019-06-07 08:55:54,443:INFO:__main__:reg:Registered new user, name: k
+2019-06-07 08:55:56,781:DEBUG:__main__:main:main interface
