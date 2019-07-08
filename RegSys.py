@@ -243,8 +243,8 @@ def logged_in(usr):
                 return True
             else:
                 # Rule/s not passed
-                return False
                 logger.debug('pass requirements not met')
+                return False
 
         if not override:
             inp = input(f'Hello {usr}, do you want to change your password? (Y/N): ').lower()
@@ -419,18 +419,18 @@ def logged_in(usr):
                 return True
             else:
                 # Rule/s not passed
-                return False
                 logger.debug('pass requirements not met')
+                return False
 
         def check_mail(mail):
             """Check if email format is correct"""
             logger.debug('checking email format')
             if re.match(r'[^@]+@[^@]+\.[^@]', mail):
-                return True
                 logger.debug('email format correct')
+                return True
             else:
-                return False
                 logger.debug('email format incorrect')
+                return False
             if not usr:
                 usr = input('Enter username: ').lower()
             logger.debug('trying to create account, username: {}'.format(usr))
@@ -756,8 +756,8 @@ def register():
             return False
         else:
             # No such user, return True
-            return True
             logger.debug('username available')
+            return True
 
     def check_pword(pw):
         """Check base requirements for password"""
@@ -774,18 +774,18 @@ def register():
             return True
         else:
             # Rule/s not passed
-            return False
             logger.debug('pass requirements not met')
+            return False
 
     def check_mail(mail):
         """Check if email format is correct"""
         logger.debug('checking email format')
         if re.match(r'[^@]+@[^@]+\.[^@]', mail):
-            return True
             logger.debug('email format correct')
+            return True
         else:
-            return False
             logger.debug('email format incorrect')
+            return False
 
     def reg():
         """User-side for register"""
