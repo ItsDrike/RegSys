@@ -11,6 +11,18 @@ import pword_mod
 DATABASE = 'database.db'
 LOG_FILE = 'logs/logfile.log'
 
+
+def ensure_dir(file_path):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+
+    if not Path(file_path).is_file():
+        with open(LOG_FILE, 'w'):
+            pass
+
+ensure_dir(LOG_FILE)
+
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG,
