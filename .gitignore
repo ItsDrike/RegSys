@@ -1,5 +1,5 @@
 # Project-specific
-logs
+logs/
 *.log
 
 ## Ignore Visual Studio temporary files, build results, and
