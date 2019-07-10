@@ -8,6 +8,9 @@ database.db
 # Python chache
 __pycache__/
 
+# Python virtual enviroment
+venv/
+
 # User-specific files
 *.suo
 *.user
