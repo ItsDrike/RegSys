@@ -925,6 +925,13 @@ def login():
     log()
 
 
+def default_user(enabled=True, pword='admin'):
+    if enabled:
+        if get_database_data('admin') is None:
+            file_register('None set', 'admin', hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 1)
+
+
+
 def main():
     """Main User-Side Interface-"""
     logger.debug('main interface')
@@ -966,6 +973,7 @@ def main():
 if __name__ == '__main__':
     logger.info('Program started directly')
     try:
+        default_user()
         main()
     except Exception as e:
         logger.exception('-Main exception-')
