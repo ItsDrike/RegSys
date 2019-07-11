@@ -60,6 +60,7 @@ From this account, you can  <br>
 - Create new users with higher permission levels (*user, admin, superadmin*) <br>
 - Remove other accounts (*within your permission level*) <br>
 - Edit existing users data (*within your permission level*) <br>
+- Everything user can do
 
 > -Welcome admin- <br>
 >  <br>
