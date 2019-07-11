@@ -1000,7 +1000,6 @@ def login():
 
 
 def default_user(enabled=True, pword='admin'):
-    create_database_tables()
     if enabled:
         if get_database_data('admin') is None:
             file_register('None set', 'admin', hashlib.sha224(
@@ -1047,16 +1046,16 @@ def main():
 
 if __name__ == '__main__':
     logger.info('Program started directly')
-    try:
-        default_user()
-        main()
-    except Exception as e:
-        logger.exception('-Main exception-')
-        logger.critical('Program Failed: %s', e)
-        print('\nProgram failed, send this error message to developer:')
-        print(f' ->  Error: {e}')
-        input('Press Enter to restart..')
-        os.system('cls')
-        main()
+    # try:
+    default_user()
+    main()
+    # except Exception as e:
+    #     logger.exception('-Main exception-')
+    #     logger.critical('Program Failed: %s', e)
+    #     print('\nProgram failed, send this error message to developer:')
+    #     print(f' ->  Error: {e}')
+    #     input('Press Enter to restart..')
+    #     os.system('cls')
+    #     main()
 else:
     logger.info('Program started non-directly')
