@@ -21,6 +21,7 @@ def ensure_dir(file_path):
         with open(LOG_FILE, 'w'):
             pass
 
+
 ensure_dir(LOG_FILE)
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG,
 
 class GetOutOfLoop(Exception):
     pass
+
 
 def is_number(num):
     try:
@@ -100,7 +102,8 @@ def get_database_data(usr):
     logger.debug('finding user %s details to change permission level', usr)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+    c.execute("SELECT * FROM users WHERE username=:usr_name",
+              {'usr_name': usr})
     fetch = c.fetchone()
     conn.commit()
     conn.close()
@@ -109,12 +112,14 @@ def get_database_data(usr):
 
 def file_register(mail, usr, pw, perms):
     """Register new user into database file"""
-    logger.debug('adding user to database - mail: %s ; usr: %s ; enc_pwd: %s ; perms: %s', mail, usr, pw, perms)
+    logger.debug(
+        'adding user to database - mail: %s ; usr: %s ; enc_pwd: %s ; perms: %s', mail, usr, pw, perms)
     try:
         create_database_tables()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("INSERT INTO users VALUES(:email, :username, :password, :permlevel)", {'email': mail, 'username': usr, 'password': pw, 'permlevel': perms})
+        c.execute("INSERT INTO users VALUES(:email, :username, :password, :permlevel)", {
+                  'email': mail, 'username': usr, 'password': pw, 'permlevel': perms})
         conn.commit()
         conn.close()
         logger.debug('user added successfully')
@@ -135,11 +140,14 @@ def change_perm_level(usr, perm):
     pw = fetch[2]
 
     if int(curpermlvl) > int(perm):
-        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> ELEVATION to %s', usr, mail, pw, curpermlvl, perm)
+        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> ELEVATION to %s',
+                     usr, mail, pw, curpermlvl, perm)
     elif int(curpermlvl) < int(perm):
-        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> DEMOTION to %s', usr, mail, pw, curpermlvl, perm)
+        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> DEMOTION to %s',
+                     usr, mail, pw, curpermlvl, perm)
     else:
-        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> PERMS EQUAL')
+        logger.debug(
+            'found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> PERMS EQUAL')
         return None
     # unregister extracted user
     unregister(usr)
@@ -155,7 +163,8 @@ def logged_in(usr):
         logger.debug('finding password for %s', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+        c.execute("SELECT * FROM users WHERE username=:usr_name",
+                  {'usr_name': usr})
         fetch = c.fetchone()
         conn.commit()
         conn.close()
@@ -167,7 +176,8 @@ def logged_in(usr):
         logger.debug('finding email for %s', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+        c.execute("SELECT * FROM users WHERE username=:usr_name",
+                  {'usr_name': usr})
         fetch = c.fetchone()
         conn.commit()
         conn.close()
@@ -179,7 +189,8 @@ def logged_in(usr):
         logger.debug('finding permission level for %s', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+        c.execute("SELECT * FROM users WHERE username=:usr_name",
+                  {'usr_name': usr})
         fetch = c.fetchone()
         conn.commit()
         conn.close()
@@ -244,10 +255,14 @@ def logged_in(usr):
             """Check base requirements for password"""
             logger.debug('checking password requirements')
             rules = [
-                lambda s: any(x.isupper() for x in s),  # must have at least one uppercase
-                lambda s: any(x.islower() for x in s),  # must have at least one lowercase
-                lambda s: any(x.isdigit() for x in s),  # must have at least one digit
-                lambda s: len(s) >= 7                   # must be at least 7 characters
+                # must have at least one uppercase
+                lambda s: any(x.isupper() for x in s),
+                # must have at least one lowercase
+                lambda s: any(x.islower() for x in s),
+                lambda s: any(x.isdigit()
+                              for x in s),  # must have at least one digit
+                # must be at least 7 characters
+                lambda s: len(s) >= 7
             ]
             if all(rule(pw) for rule in rules):
                 # All rules passed
@@ -259,7 +274,8 @@ def logged_in(usr):
                 return False
 
         if not override:
-            inp = input(f'Hello {usr}, do you want to change your password? (Y/N): ').lower()
+            inp = input(
+                f'Hello {usr}, do you want to change your password? (Y/N): ').lower()
         else:
             logger.debug('Overriding confirmation prompt')
             inp = 'y'
@@ -282,27 +298,34 @@ def logged_in(usr):
                         mail = get_mail(usr)
                         perm_level = get_perm_level(usr)
                         unregister(usr)
-                        logger.info('User %s Unregistered (to change password)', usr)
-                        enc_pass = hashlib.sha224(new_pass.encode('UTF-8')).hexdigest()
+                        logger.info(
+                            'User %s Unregistered (to change password)', usr)
+                        enc_pass = hashlib.sha224(
+                            new_pass.encode('UTF-8')).hexdigest()
                         file_register(mail, usr, enc_pass, perm_level)
                         logger.info('User %s was registered with new password')
-                        logger.debug('New encrypted password of %s is: %s', usr, enc_pass)
+                        logger.debug(
+                            'New encrypted password of %s is: %s', usr, enc_pass)
                         print('\nPassword has been changed successfully')
                         input('Press Enter to continue..')
                         main_log()
                     else:
                         logger.debug('password requirements not met')
-                        print('\nPassword does not meet requirements. Must contain at least:')
-                        print('  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
+                        print(
+                            '\nPassword does not meet requirements. Must contain at least:')
+                        print(
+                            '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
                         input('Press Enter to continue..')
                         change_pwd(True)
-                        logger.debug('Restarting with override (yes prompt and old pass entry)')
+                        logger.debug(
+                            'Restarting with override (yes prompt and old pass entry)')
 
                 else:
                     logger.debug('Passwords are not matching')
                     print('\nPasswords are not matching')
                     input('Press any key to continue..')
-                    logger.debug('Restarting with override (yes prompt and old pass entry)')
+                    logger.debug(
+                        'Restarting with override (yes prompt and old pass entry)')
                     change_pwd(True)
             else:
                 logger.debug('Old password incorrect')
@@ -335,7 +358,8 @@ def logged_in(usr):
         """Remove selected user from database"""
         logger.debug('Remove user function')
         os.system('cls')
-        print(f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} User Management-')
+        print(
+            f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} User Management-')
 
         def check_usr(usr):
             """Check if username exists in database"""
@@ -343,7 +367,8 @@ def logged_in(usr):
             create_database_tables()
             conn = sqlite3.connect(DATABASE)
             c = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+            c.execute("SELECT * FROM users WHERE username=:usr_name",
+                      {'usr_name': usr})
             fetch = c.fetchone()
             conn.commit()
             conn.close()
@@ -366,19 +391,23 @@ def logged_in(usr):
             mail = get_mail(usr_del)
             permission = get_perm_level(usr_del)
             perms = perm_lvl_readable(permission)
-            print(f'\nAccount found:\n   Username: {usr_del}\n   Registered E-Mail Address: {mail}\n   Permission: {perms} ({permission})')
-            inp = input('\nDo you really wish to remove this account? (Y/N): ').lower()
+            print(
+                f'\nAccount found:\n   Username: {usr_del}\n   Registered E-Mail Address: {mail}\n   Permission: {perms} ({permission})')
+            inp = input(
+                '\nDo you really wish to remove this account? (Y/N): ').lower()
             if inp == 'y':
                 logger.debug('Account removal user-confirmed')
                 if int(permission) > perm or perm == 0:
                     logger.debug('Permissions checked')
-                    logger.info('User %s has been unregistered by %s (higher-perm-user-confirmed)', usr_del, usr)
+                    logger.info(
+                        'User %s has been unregistered by %s (higher-perm-user-confirmed)', usr_del, usr)
                     unregister(usr_del)
                     print(f'User {usr_del} (type: {perms}) was unregistered')
                     input('Press Enter to continue..')
                     main_log()
                 else:
-                    print('Your permission level in insufficient to remove {perms} type account.')
+                    print(
+                        'Your permission level in insufficient to remove {perms} type account.')
                     input('Press Enter to continue..')
                     main_log()
             else:
@@ -395,7 +424,8 @@ def logged_in(usr):
         """Create new user with specified data"""
         logger.debug('Create user function')
         os.system('cls')
-        print(f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} Register-')
+        print(
+            f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} Register-')
 
         def check_usr(usr):
             """Check if username exists in database"""
@@ -403,7 +433,8 @@ def logged_in(usr):
             create_database_tables()
             conn = sqlite3.connect(DATABASE)
             c = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+            c.execute("SELECT * FROM users WHERE username=:usr_name",
+                      {'usr_name': usr})
             fetch = c.fetchone()
             conn.commit()
             conn.close()
@@ -420,10 +451,14 @@ def logged_in(usr):
             """Check base requirements for password"""
             logger.debug('checking password requirements')
             rules = [
-                lambda s: any(x.isupper() for x in s),  # must have at least one uppercase
-                lambda s: any(x.islower() for x in s),  # must have at least one lowercase
-                lambda s: any(x.isdigit() for x in s),  # must have at least one digit
-                lambda s: len(s) >= 7                   # must be at least 7 characters
+                # must have at least one uppercase
+                lambda s: any(x.isupper() for x in s),
+                # must have at least one lowercase
+                lambda s: any(x.islower() for x in s),
+                lambda s: any(x.isdigit()
+                              for x in s),  # must have at least one digit
+                # must be at least 7 characters
+                lambda s: len(s) >= 7
             ]
             if all(rule(pw) for rule in rules):
                 # All rules passed
@@ -486,26 +521,32 @@ def logged_in(usr):
                             if perm < perm_level or perm == 0:
                                 # All conditions met, register user
                                 if file_register(mail, usr, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), perm_level):
-                                    logger.info('Registered new user, name: {}'.format(usr))
+                                    logger.info(
+                                        'Registered new user, name: {}'.format(usr))
                                     print('\nRegistered successfully')
                                     input('Press Enter to continue...')
                                     os.system('cls')
                                     main_log()
                                 else:
                                     # In case of failure in file_register()
-                                    logger.error('Register encryption function failed')
-                                    print('\nRegister failed, please see log details (%s)', LOG_FILE)
-                                    print('In case you are unable to figure out how to fix this issue, please send logfile to the developer')
+                                    logger.error(
+                                        'Register encryption function failed')
+                                    print(
+                                        '\nRegister failed, please see log details (%s)', LOG_FILE)
+                                    print(
+                                        'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
                                     input('Press Enter to continue...')
                                     os.system('cls')
                                     main_log()
                             else:
-                                print(f'Your permission level is not sufficient to create account with permission {perm_level}')
+                                print(
+                                    f'Your permission level is not sufficient to create account with permission {perm_level}')
                                 input('\nPress Enter to continue..')
                                 os.system('cls')
                                 create_user(perm, usr, mail)
                         else:
-                            print('Invalid permission level (permission level must be a number)')
+                            print(
+                                'Invalid permission level (permission level must be a number)')
                             print('-> 0: developer')
                             print('-> 1: administrator')
                             print('-> 2: admin')
@@ -516,8 +557,10 @@ def logged_in(usr):
                     else:
                         # In case password does not meet requirements
                         logger.debug('password requirements not met')
-                        print('\nPassword does not meet requirements. Must contain at least:')
-                        print('  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
+                        print(
+                            '\nPassword does not meet requirements. Must contain at least:')
+                        print(
+                            '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
                         input('Press Enter to continue..')
                         os.system('cls')
                         create_user(perm, usr, mail)
@@ -546,16 +589,21 @@ def logged_in(usr):
                 logger.debug('Username override confirmed')
                 perms = get_perm_level(usr)
                 if perms > perm:
-                    logger.debug('Override successfull, permission level is sufficient')
+                    logger.debug(
+                        'Override successfull, permission level is sufficient')
                     unregister(usr)
-                    logger.info('Unregistering %s, his perm level was: %s; user removed by: %s, with perm level: %s', usr, perms, usr, perm)
-                    print(f'User {usr} was unregistered, his perm level was: {perms}')
+                    logger.info(
+                        'Unregistering %s, his perm level was: %s; user removed by: %s, with perm level: %s', usr, perms, usr, perm)
+                    print(
+                        f'User {usr} was unregistered, his perm level was: {perms}')
                     input('\nPress Enter to continue..')
                     create_user(perm, usr)
                 else:
-                    logger.debug('Override function failed, permission level is not sufficient')
+                    logger.debug(
+                        'Override function failed, permission level is not sufficient')
                     perms = perm_lvl_readable(get_perm_level(usr))
-                    print(f'Sorry, your permission level is not sufficient do delete {perms} type account')
+                    print(
+                        f'Sorry, your permission level is not sufficient do delete {perms} type account')
                     input('\nPress Enter to continue..')
                     os.system('cls')
                     create_user(perm)
@@ -639,32 +687,41 @@ def logged_in(usr):
                         while True:
                             os.system('cls')
                             print('-Python shell-')
-                            print('Developer access (enter direct python commands)\n')
+                            print(
+                                'Developer access (enter direct python commands)\n')
                             print(f'Python {sys.version}')
                             print('Type "help" for more information')
                             while True:
                                 inp = input('>>>')
                                 if inp.lower() != 'exit' and inp.lower() != 'help':
-                                    logger.info('Python DeveloperShell: %s', inp)
+                                    logger.info(
+                                        'Python DeveloperShell: %s', inp)
                                     try:
                                         exec(inp)
                                     except Exception as e:
                                         print('  Exception handeler -> Error:')
                                         print(f'    Error: {e}')
-                                        logger.warning('Python DeveloperShell returned Error -> %s', e)
+                                        logger.warning(
+                                            'Python DeveloperShell returned Error -> %s', e)
                                 elif inp.lower() == 'help':
                                     logger.debug('Python DeveloperShell help')
                                     os.system('cls')
                                     print('-Help-\n')
                                     print('This is a python developer shell')
-                                    print('You can execute direct python commands into program')
-                                    print('Warning: executing wrong commands can break this instance of the program')
-                                    print('If you don\'t know what are you doing, please exit the developer shell')
-                                    print('-------------------------------------------------------------------------')
+                                    print(
+                                        'You can execute direct python commands into program')
+                                    print(
+                                        'Warning: executing wrong commands can break this instance of the program')
+                                    print(
+                                        'If you don\'t know what are you doing, please exit the developer shell')
+                                    print(
+                                        '-------------------------------------------------------------------------')
                                     print('Type \'exit\' to exit developer shell')
-                                    inp = input('\nPress enter to return to developer shell\n')
+                                    inp = input(
+                                        '\nPress enter to return to developer shell\n')
                                     if inp.lower() == 'exit':
-                                        logger.debug('Python DeveloperShell exit (in help)')
+                                        logger.debug(
+                                            'Python DeveloperShell exit (in help)')
                                         main_log()
                                     else:
                                         break
@@ -691,7 +748,8 @@ def logged_in(usr):
                     logger.debug('Choosed %s with perm %s', act, n)
                     create_user(n)
                 else:
-                    logger.debug('Choosed %s with perm %s (no such option)', act, n)
+                    logger.debug(
+                        'Choosed %s with perm %s (no such option)', act, n)
                     print('Error, no such option option')
                     input('\nPress Enter to continue..')
                     os.system('cls')
@@ -699,7 +757,8 @@ def logged_in(usr):
             else:
                 # Error, wrong permission level
                 logger.error('Error: Permission level not recognized')
-                print('Error -> Your account has bad permission level, please contact admin or create new account.')
+                print(
+                    'Error -> Your account has bad permission level, please contact admin or create new account.')
                 print('Temporarily, you will be asigned permission level 3 - (user)')
                 input('\nPress Enter to continue..')
                 main_log(3)
@@ -707,7 +766,8 @@ def logged_in(usr):
             if action == '*':
                 main()
             else:
-                logger.error('Choosed %s with perm %s (no such option - not a number)', action, n)
+                logger.error(
+                    'Choosed %s with perm %s (no such option - not a number)', action, n)
                 print('Error, no such option option (must be number)')
                 input('\nPress Enter to continue..')
                 os.system('cls')
@@ -728,7 +788,8 @@ def logged_in(usr):
 
         print(f'(Your current E-Mail: {mail})')
         if perms:
-            print(f'(Your permission level: Temporal {perm} - Contact developer for more info or create new account.)')
+            print(
+                f'(Your permission level: Temporal {perm} - Contact developer for more info or create new account.)')
         else:
             print(f'(Your permission level: {perm})')
         print(f'(Your Encrypted password: {pw})\n')
@@ -758,7 +819,8 @@ def register():
         create_database_tables()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name", {'usr_name': usr})
+        c.execute("SELECT * FROM users WHERE username=:usr_name",
+                  {'usr_name': usr})
         fetch = c.fetchone()
         conn.commit()
         conn.close()
@@ -775,10 +837,14 @@ def register():
         """Check base requirements for password"""
         logger.debug('checking password requirements')
         rules = [
-            lambda s: any(x.isupper() for x in s),  # must have at least one uppercase
-            lambda s: any(x.islower() for x in s),  # must have at least one lowercase
-            lambda s: any(x.isdigit() for x in s),  # must have at least one digit
-            lambda s: len(s) >= 7                   # must be at least 7 characters
+            # must have at least one uppercase
+            lambda s: any(x.isupper() for x in s),
+            # must have at least one lowercase
+            lambda s: any(x.islower() for x in s),
+            lambda s: any(x.isdigit()
+                          for x in s),  # must have at least one digit
+            # must be at least 7 characters
+            lambda s: len(s) >= 7
         ]
         if all(rule(pw) for rule in rules):
             # All rules passed
@@ -827,24 +893,30 @@ def register():
                             logger.debug('password requirements confirmed')
                             # All conditions met, register user
                             if file_register(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
-                                logger.info('Registered new user, name: {}'.format(usr_name))
+                                logger.info(
+                                    'Registered new user, name: {}'.format(usr_name))
                                 print('\nRegistered successfully')
                                 input('Press Enter to continue...')
                                 os.system('cls')
                                 main()
                             else:
                                 # In case of failure in file_register()
-                                logger.error('Register encryption function failed')
-                                print('\nRegister failed, please see log details (%s)', LOG_FILE)
-                                print('In case you are unable to figure out how to fix this issue, please send logfile to the developer')
+                                logger.error(
+                                    'Register encryption function failed')
+                                print(
+                                    '\nRegister failed, please see log details (%s)', LOG_FILE)
+                                print(
+                                    'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
                                 input('Press Enter to continue...')
                                 os.system('cls')
                                 main()
                         else:
                             # In case password does not meet requirements
                             logger.debug('password requirements not met')
-                            print('\nPassword does not meet requirements. Must contain at least:')
-                            print('  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
+                            print(
+                                '\nPassword does not meet requirements. Must contain at least:')
+                            print(
+                                '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
                             input('Press Enter to continue..')
                             os.system('cls')
                             reg()
@@ -880,7 +952,8 @@ def login():
         create_database_tables()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name AND password=:pword", {'usr_name': usr, 'pword': pw})
+        c.execute("SELECT * FROM users WHERE username=:usr_name AND password=:pword",
+                  {'usr_name': usr, 'pword': pw})
         fetch = c.fetchone()
         conn.commit()
         conn.close()
@@ -928,8 +1001,8 @@ def login():
 def default_user(enabled=True, pword='admin'):
     if enabled:
         if get_database_data('admin') is None:
-            file_register('None set', 'admin', hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 1)
-
+            file_register('None set', 'admin', hashlib.sha224(
+                pword.encode('UTF-8')).hexdigest(), 1)
 
 
 def main():
