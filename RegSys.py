@@ -1,10 +1,11 @@
-import sys
-import os
 import hashlib
-import sqlite3
 import logging
-from pathlib import Path
+import os
 import re
+import sqlite3
+import sys
+from pathlib import Path
+
 import pword_mod
 
 # Path to user database
