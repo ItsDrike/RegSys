@@ -1000,6 +1000,7 @@ def login():
 
 
 def default_user(enabled=True, pword='admin'):
+    create_database_tables()
     if enabled:
         if get_database_data('admin') is None:
             file_register('None set', 'admin', hashlib.sha224(
