@@ -1046,16 +1046,16 @@ def main():
 
 if __name__ == '__main__':
     logger.info('Program started directly')
-    # try:
-    default_user()
-    main()
-    # except Exception as e:
-    #     logger.exception('-Main exception-')
-    #     logger.critical('Program Failed: %s', e)
-    #     print('\nProgram failed, send this error message to developer:')
-    #     print(f' ->  Error: {e}')
-    #     input('Press Enter to restart..')
-    #     os.system('cls')
-    #     main()
+    try:
+        default_user()
+        main()
+    except Exception as e:
+        logger.exception('-Main exception-')
+        logger.critical('Program Failed: %s', e)
+        print('\nProgram failed, send this error message to developer:')
+        print(f' ->  Error: {e}')
+        input('Press Enter to restart..')
+        os.system('cls')
+        main()
 else:
     logger.info('Program started non-directly')
