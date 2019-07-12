@@ -344,7 +344,7 @@ def logged_in(usr):
             input('Password change aborted, Press Enter to continue..')
             main_log()
 
-    # TODO: function
+    # TODO:Add functionality to change mail
     def change_mail():
         """Change email of logged user"""
         print('This function is not available')
@@ -352,7 +352,7 @@ def logged_in(usr):
         os.system('cls')
         main_log()
 
-    # TODO: function
+    # TODO: Add functionality to edit user
     def edit_user(perm):
         """Edit database information about selected user"""
         print('This function is not available')
@@ -426,7 +426,6 @@ def logged_in(usr):
             input('\nPress Enter to continue')
             remove_user(perm)
 
-    # TODO: Add Logger
     def create_user(perm, usr=None, mail=None):
         """Create new user with specified data"""
         logger.debug('Create user function')
@@ -501,7 +500,6 @@ def logged_in(usr):
         if usr == '*':
             main_log()
 
-        # TODO: complete function
         if check_usr(usr) is True:
             if not mail:
                 mail = input('Enter your email address: ').lower()
