@@ -12,6 +12,8 @@ import pword_mod
 DATABASE = 'database.db'
 LOG_FILE = 'logs/logfile.log'
 
+see_logs = True
+
 
 def ensure_dir(file_path):
     directory = os.path.dirname(file_path)
@@ -25,7 +27,11 @@ def ensure_dir(file_path):
 
 ensure_dir(LOG_FILE)
 
-logger.add(LOG_FILE, format='{time} {level} {message}', level='DEBUG')
+logger.add(LOG_FILE, level='DEBUG', format='<green>{time: YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level}</level>  | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>',
+           filter=None, colorize=None, serialize=False, backtrace=True, diagnose=True, enqueue=False, catch=True)
+
+if not see_logs:
+    logger.remove(0)
 
 
 class GetOutOfLoop(Exception):
