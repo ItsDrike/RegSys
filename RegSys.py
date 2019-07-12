@@ -1,9 +1,9 @@
 import hashlib
-import logging
 import os
 import re
 import sqlite3
 import sys
+from loguru import logger
 from pathlib import Path
 
 import pword_mod
@@ -25,10 +25,7 @@ def ensure_dir(file_path):
 
 ensure_dir(LOG_FILE)
 
-logger = logging.getLogger(__name__)
-
-logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG,
-                    format='%(asctime)s:%(levelname)s:%(name)s:%(funcName)s:%(message)s')
+logger.add(LOG_FILE, format='{time} {level} {message}', level='DEBUG')
 
 
 class GetOutOfLoop(Exception):
@@ -74,7 +71,7 @@ def get_database_tables():
     data = c.fetchall()
     conn.commit()
     conn.close()
-    logger.debug('Database tables returned, data: %s', data)
+    logger.debug('Database tables returned, data: {}', data)
     return data
 
 
@@ -89,7 +86,7 @@ def delete_database_table():
 
 
 def unregister(usr):
-    logger.info('removing user %s from database', usr)
+    logger.info('removing user {} from database', usr)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM users WHERE username=:usr_name", {'usr_name': usr})
@@ -100,7 +97,7 @@ def unregister(usr):
 
 def get_database_data(usr):
     create_database_tables()
-    logger.debug('finding user %s details to change permission level', usr)
+    logger.debug('finding user {} details to change permission level', usr)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -114,7 +111,7 @@ def get_database_data(usr):
 def file_register(mail, usr, pw, perms):
     """Register new user into database file"""
     logger.debug(
-        'adding user to database - mail: %s ; usr: %s ; enc_pwd: %s ; perms: %s', mail, usr, pw, perms)
+        'adding user to database - mail: {} ; usr: {} ; enc_pwd: {} ; perms: {}', mail, usr, pw, perms)
     try:
         create_database_tables()
         conn = sqlite3.connect(DATABASE)
@@ -126,13 +123,13 @@ def file_register(mail, usr, pw, perms):
         logger.debug('user added successfully')
         return True
     except Exception as e:
-        logger.error('unable to register user %s -> %s', usr, e)
+        logger.error('unable to register user {} -> {}', usr, e)
         return False
 
 
 def change_perm_level(usr, perm):
     """Change permission level of specified user"""
-    logger.debug('changing permission level of user %s, to %s', usr, perm)
+    logger.debug('changing permission level of user {}, to {}', usr, perm)
     # Get database data, to be able to register new user under same data (with changed permission level)
     fetch = get_database_data(usr)
     # extract database data to multiple vars
@@ -141,18 +138,18 @@ def change_perm_level(usr, perm):
     pw = fetch[2]
 
     if int(curpermlvl) > int(perm):
-        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> ELEVATION to %s',
+        logger.debug('found user info: (usr: {}, mail: {}, enc-pw: {}, perms: {}) --> ELEVATION to {}',
                      usr, mail, pw, curpermlvl, perm)
     elif int(curpermlvl) < int(perm):
-        logger.debug('found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> DEMOTION to %s',
+        logger.debug('found user info: (usr: {}, mail: {}, enc-pw: {}, perms: {}) --> DEMOTION to {}',
                      usr, mail, pw, curpermlvl, perm)
     else:
         logger.debug(
-            'found user info: (usr: %s, mail: %s, enc-pw: %s, perms: %s) --> PERMS EQUAL')
+            'found user info: (usr: {}, mail: {}, enc-pw: {}, perms: {}) --> PERMS EQUAL')
         return None
     # unregister extracted user
     unregister(usr)
-    # register extracted user back, with diffirent permission
+    # register extracted user back, with different permission
     file_register(mail, usr, pw, perm)
     logger.debug('permission level changed successfully')
 
@@ -161,7 +158,7 @@ def logged_in(usr):
     """User-side for Logged-In"""
     def get_pass(usr):
         """Get encrypted password from username in database"""
-        logger.debug('finding password for %s', usr)
+        logger.debug('finding password for {}', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -169,12 +166,12 @@ def logged_in(usr):
         fetch = c.fetchone()
         conn.commit()
         conn.close()
-        logger.debug('password found: %s', fetch[2])
+        logger.debug('password found: {}', fetch[2])
         return fetch[2]
 
     def get_mail(usr):
         """Get email address from username in database"""
-        logger.debug('finding email for %s', usr)
+        logger.debug('finding email for {}', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -182,12 +179,12 @@ def logged_in(usr):
         fetch = c.fetchone()
         conn.commit()
         conn.close()
-        logger.debug('email address found: %s', fetch[0])
+        logger.debug('email address found: {}', fetch[0])
         return fetch[0]
 
     def get_perm_level(usr):
         """Get encrypted password from username in database"""
-        logger.debug('finding permission level for %s', usr)
+        logger.debug('finding permission level for {}', usr)
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -196,7 +193,7 @@ def logged_in(usr):
         conn.commit()
         conn.close()
         permlvl = fetch[3]
-        logger.debug('permission level found: %s', permlvl)
+        logger.debug('permission level found: {}', permlvl)
         return permlvl
 
     def perm_lvl_readable(permlvl):
@@ -209,8 +206,10 @@ def logged_in(usr):
             val = 'superadmin'
         elif permlvl == 0:
             val = 'developer'
-        logger.debug('level interpreted as: %s', val)
+        logger.debug('level interpreted as: {}', val)
         return val
+
+    # TODO: Add close account option
 
     def maxlevel():
         logger.debug('Showing maxlevel options')
@@ -248,7 +247,7 @@ def logged_in(usr):
 
     def change_pwd(override=False):
         """Change password of logged user"""
-        logger.debug('trying to change password of %s', usr)
+        logger.debug('trying to change password of {}', usr)
         os.system('cls')
         print('-Change password-')
 
@@ -300,13 +299,13 @@ def logged_in(usr):
                         perm_level = get_perm_level(usr)
                         unregister(usr)
                         logger.info(
-                            'User %s Unregistered (to change password)', usr)
+                            'User {} Unregistered (to change password)', usr)
                         enc_pass = hashlib.sha224(
                             new_pass.encode('UTF-8')).hexdigest()
                         file_register(mail, usr, enc_pass, perm_level)
-                        logger.info('User %s was registered with new password')
+                        logger.info('User {} was registered with new password')
                         logger.debug(
-                            'New encrypted password of %s is: %s', usr, enc_pass)
+                            'New encrypted password of {} is: {}', usr, enc_pass)
                         print('\nPassword has been changed successfully')
                         input('Press Enter to continue..')
                         main_log()
@@ -388,7 +387,7 @@ def logged_in(usr):
             main_log()
         if not check_usr(usr_del):
             # Username exists
-            logger.debug('Username %s is linked with an account', usr_del)
+            logger.debug('Username {} is linked with an account', usr_del)
             mail = get_mail(usr_del)
             permission = get_perm_level(usr_del)
             perms = perm_lvl_readable(permission)
@@ -401,7 +400,7 @@ def logged_in(usr):
                 if int(permission) > perm or perm == 0:
                     logger.debug('Permissions checked')
                     logger.info(
-                        'User %s has been unregistered by %s (higher-perm-user-confirmed)', usr_del, usr)
+                        'User {} has been unregistered by {} (higher-perm-user-confirmed)', usr_del, usr)
                     unregister(usr_del)
                     print(f'User {usr_del} (type: {perms}) was unregistered')
                     input('Press Enter to continue..')
@@ -409,13 +408,14 @@ def logged_in(usr):
                 else:
                     print(
                         'Your permission level in insufficient to remove {perms} type account.')
+                    logger.debug('Insufficient permission level ({}) to remove {}({}) type account', perm, perms, permission)
                     input('Press Enter to continue..')
                     main_log()
             else:
                 input('Aborting, Press Enter to continue..')
                 main_log()
         else:
-            logger.debug('Username %s is NOT linked with an account', usr_del)
+            logger.debug('Username {} is NOT linked with an account', usr_del)
             print(f'There is no such account with username: {usr_del}')
             input('\nPress Enter to continue')
             remove_user(perm)
@@ -519,7 +519,7 @@ def logged_in(usr):
                         permission_lev = input('Enter permission level: ')
                         if is_number(permission_lev):
                             perm_level = int(permission_lev)
-                            if perm < perm_level or perm == 0:
+                            if perm <= perm_level or perm == 0:
                                 # All conditions met, register user
                                 if file_register(mail, usr, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), perm_level):
                                     logger.info(
@@ -533,7 +533,7 @@ def logged_in(usr):
                                     logger.error(
                                         'Register encryption function failed')
                                     print(
-                                        '\nRegister failed, please see log details (%s)', LOG_FILE)
+                                        '\nRegister failed, please see log details ({})', LOG_FILE)
                                     print(
                                         'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
                                     input('Press Enter to continue...')
@@ -594,7 +594,7 @@ def logged_in(usr):
                         'Override successfull, permission level is sufficient')
                     unregister(usr)
                     logger.info(
-                        'Unregistering %s, his perm level was: %s; user removed by: %s, with perm level: %s', usr, perms, usr, perm)
+                        'Unregistering {}, his perm level was: {}; user removed by: {}, with perm level: {}', usr, perms, usr, perm)
                     print(
                         f'User {usr} was unregistered, his perm level was: {perms}')
                     input('\nPress Enter to continue..')
@@ -623,7 +623,7 @@ def logged_in(usr):
         """Get input from user to choose option, based on user's permission level"""
         logger.debug('Choosing from options')
         action = input('\nEnter action number: ')
-        logger.debug('action choosed: %s, perm level: %s', action, n)
+        logger.debug('action choosed: {}, perm level: {}', action, n)
         try:
             act = int(action)
             if n == 3:
@@ -680,10 +680,10 @@ def logged_in(usr):
             elif n == 0:
                 # Max Level
                 if act == 7:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     main()
                 elif act == 6:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     try:
                         while True:
                             os.system('cls')
@@ -696,14 +696,14 @@ def logged_in(usr):
                                 inp = input('>>>')
                                 if inp.lower() != 'exit' and inp.lower() != 'help':
                                     logger.info(
-                                        'Python DeveloperShell: %s', inp)
+                                        'Python DeveloperShell: {}', inp)
                                     try:
                                         exec(inp)
                                     except Exception as e:
-                                        print('  Exception handeler -> Error:')
+                                        print('  Exception handler -> Error:')
                                         print(f'    Error: {e}')
                                         logger.warning(
-                                            'Python DeveloperShell returned Error -> %s', e)
+                                            'Python DeveloperShell returned Error -> {}', e)
                                 elif inp.lower() == 'help':
                                     logger.debug('Python DeveloperShell help')
                                     os.system('cls')
@@ -734,23 +734,23 @@ def logged_in(usr):
                     except GetOutOfLoop:
                         main_log()
                 elif act == 5:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     change_pwd()
                 elif act == 4:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     change_mail()
                 elif act == 3:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     edit_user(n)
                 elif act == 2:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     remove_user(n)
                 elif act == 1:
-                    logger.debug('Choosed %s with perm %s', act, n)
+                    logger.debug('Choosed {} with perm {}', act, n)
                     create_user(n)
                 else:
                     logger.debug(
-                        'Choosed %s with perm %s (no such option)', act, n)
+                        'Choosed {} with perm {} (no such option)', act, n)
                     print('Error, no such option option')
                     input('\nPress Enter to continue..')
                     os.system('cls')
@@ -760,7 +760,7 @@ def logged_in(usr):
                 logger.error('Error: Permission level not recognized')
                 print(
                     'Error -> Your account has bad permission level, please contact admin or create new account.')
-                print('Temporarily, you will be asigned permission level 3 - (user)')
+                print('Temporarily, you will be assigned permission level 3 - (user)')
                 input('\nPress Enter to continue..')
                 main_log(3)
         except ValueError:
@@ -768,14 +768,14 @@ def logged_in(usr):
                 main()
             else:
                 logger.error(
-                    'Choosed %s with perm %s (no such option - not a number)', action, n)
+                    'Choosed {} with perm {} (no such option - not a number)', action, n)
                 print('Error, no such option option (must be number)')
                 input('\nPress Enter to continue..')
                 os.system('cls')
                 main_log()
 
     def main_log(perms=None):
-        logger.debug('Logged as %s', usr)
+        logger.debug('Logged as {}', usr)
         os.system('cls')
         print(f'-Welcome {usr}-\n')
         pw = get_pass(usr)
@@ -905,7 +905,7 @@ def register():
                                 logger.error(
                                     'Register encryption function failed')
                                 print(
-                                    '\nRegister failed, please see log details (%s)', LOG_FILE)
+                                    '\nRegister failed, please see log details ({})', LOG_FILE)
                                 print(
                                     'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
                                 input('Press Enter to continue...')
@@ -930,7 +930,7 @@ def register():
                         reg()
 
                 else:
-                    # Username is aleardy taken
+                    # Username is already taken
                     logger.debug('registration username invalid (taken)')
                     print('\nThis username is not available')
                     input('Press Enter to continue..')
@@ -960,11 +960,11 @@ def login():
         conn.close()
         if type(fetch) == tuple:
             # User with entered specs found, return True
-            logger.debug('user verification confirmed (name: %s)', usr)
+            logger.debug('user verification confirmed (name: {})', usr)
             return True
         else:
             # User with entered specs not found, return False
-            logger.debug('user verification failed (name: %s)', usr)
+            logger.debug('user verification failed (name: {})', usr)
             return False
 
     def log():
@@ -982,7 +982,7 @@ def login():
         if verify(usr_name, pword_enc):
             # User exists
             logger.debug('user information confirmed, user exists')
-            logger.info('user %s logged.', usr_name)
+            logger.info('user {} logged.', usr_name)
             print('\nLogged in successfully')
             input('Press Enter to continue..')
             os.system('cls')
@@ -1006,6 +1006,7 @@ def default_user(enabled=True, pword='admin'):
                 pword.encode('UTF-8')).hexdigest(), 1)
 
 
+@logger.catch
 def main():
     """Main User-Side Interface-"""
     logger.debug('main interface')
@@ -1026,7 +1027,7 @@ def main():
         os.system('cls')
         login()
     elif register_prompt.lower() == '*':
-        logger.info('choice: END (*)')
+        logger.debug('choice: END (*)')
         logger.info('Program ended by user')
         input('Press enter to end program..')
         exit()
@@ -1051,7 +1052,7 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         logger.exception('-Main exception-')
-        logger.critical('Program Failed: %s', e)
+        logger.critical('Program Failed: {}', e)
         print('\nProgram failed, send this error message to developer:')
         print(f' ->  Error: {e}')
         input('Press Enter to restart..')
