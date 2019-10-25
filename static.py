@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
-from importlib import import_module
+
+
+class GetOutOfLoop(Exception):
+    pass
 
 
 def ensure_dir(file_path, LOG_FILE='logs/logfile.log'):
@@ -14,7 +17,6 @@ def ensure_dir(file_path, LOG_FILE='logs/logfile.log'):
 
 
 def is_number(num):
-    GetOutOfLoop = import_module('RegSys.py').GetOutOfLoop
     try:
         _ = int(num)
         return True

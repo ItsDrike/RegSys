@@ -25,10 +25,6 @@ if not see_logs:
     logger.remove(0)
 
 
-class GetOutOfLoop(Exception):
-    pass
-
-
 def logged_in(usr):
     """User-side for Logged-In"""
     def get_pass(usr):
@@ -601,10 +597,10 @@ def logged_in(usr):
                                         break
                                 else:
                                     logger.debug('Python DeveloperShell exit')
-                                    raise GetOutOfLoop
+                                    raise static.GetOutOfLoop
                             else:
                                 continue
-                    except GetOutOfLoop:
+                    except static.GetOutOfLoop:
                         main_log()
                 elif act == 5:
                     logger.debug('Choosed {} with perm {}', act, n)
