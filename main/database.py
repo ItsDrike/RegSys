@@ -75,7 +75,7 @@ def remove_user(usr, DATABASE='database.db'):
     '''Removes specified user from database
 
     Arguments:
-        usr {stringf} -- Username
+        usr {string} -- Username
 
     Keyword Arguments:
         DATABASE {string} -- Path to database file (default: {'database.db'})
@@ -174,7 +174,7 @@ def update_user_permissions(usr, perm, DATABASE='database.db'):
         logger.debug(
             'found user info: (usr: {}, mail: {}, enc-pw: {}, perms: {}) --> PERMS EQUAL')
     # unregister extracted user
-    remove(usr, DATABASE)
+    remove_user(usr, DATABASE)
     # register extracted user back, with different permission
     register_user(mail, usr, pw, perm)
     logger.debug('permission level changed successfully')

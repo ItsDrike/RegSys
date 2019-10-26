@@ -4,8 +4,8 @@ import re
 import sqlite3
 import sys
 from loguru import logger
-import static
-import database
+import main.static as static
+import main.database as database
 
 import pword_mod
 
