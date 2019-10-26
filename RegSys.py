@@ -561,36 +561,34 @@ def register():
 
 def login():
     """Main login function"""
-    def log():
-        """User-side for login"""
-        logger.debug('logging-in process started')
-        print('-Login-')
-        usr_name = input('Enter your username: ').lower()
-        # If name is * go back
-        if usr_name == '*':
-            logger.info('logging-in aborted')
-            main()
-        pword = pword_mod.get_pword('State your password: ')
-        pword_enc = hashlib.sha224(pword.encode('UTF-8')).hexdigest()
-        # Send username with encrypted password for verify
-        if database.account_exists(usr_name, pword_enc):
-            # User exists
-            logger.debug('user information confirmed, user exists')
-            logger.info('user {} logged.', usr_name)
-            print('\nLogged in successfully')
-            input('Press Enter to continue..')
-            os.system('cls')
-            # Go to logged screen
-            logged_in(usr_name)
-            return None
-        else:
-            # No such user
-            logger.debug('username or password incorrect')
-            print('\nInvalid username or password')
-            input('Press Enter to continue..')
-            os.system('cls')
-            log()
-    log()
+    """User-side for login"""
+    logger.debug('logging-in process started')
+    print('-Login-')
+    usr_name = input('Enter your username: ').lower()
+    # If name is * go back
+    if usr_name == '*':
+        logger.info('logging-in aborted')
+        main()
+    pword = pword_mod.get_pword('State your password: ')
+    pword_enc = hashlib.sha224(pword.encode('UTF-8')).hexdigest()
+    # Send username with encrypted password for verify
+    if database.account_exists(usr_name, pword_enc):
+        # User exists
+        logger.debug('user information confirmed, user exists')
+        logger.info('user {} logged.', usr_name)
+        print('\nLogged in successfully')
+        input('Press Enter to continue..')
+        os.system('cls')
+        # Go to logged screen
+        logged_in(usr_name)
+        return None
+    else:
+        # No such user
+        logger.debug('username or password incorrect')
+        print('\nInvalid username or password')
+        input('Press Enter to continue..')
+        os.system('cls')
+        login()
 
 
 def default_user(enabled=True, pword='admin'):
@@ -625,11 +623,6 @@ def main():
         logger.info('Program ended by user')
         input('Press enter to end program..')
         exit()
-    elif register_prompt.lower() == '*':
-        print(database.get_tables())
-        input('Press Enter to continue..')
-        os.system('cls')
-        main()
     else:
         # Wrong option
         logger.debug('choice: invalid ({})'.format(register_prompt))
