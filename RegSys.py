@@ -1,4 +1,3 @@
-import hashlib
 import os
 import sys
 from loguru import logger
@@ -48,7 +47,7 @@ def logged_in(usr):
                 logger.debug('Overriding old_pass entry')
                 print('')
                 old_pass = ''
-            if hashlib.sha224(old_pass.encode('UTF-8')).hexdigest() == database.get_pass(usr) or override:
+            if static.encrypt(old_pass) == database.get_pass(usr) or override:
                 logger.debug('Old password is correct (or override is ON)')
                 new_pass = pword_mod.get_pword('Enter new password: ')
                 new_pass2 = pword_mod.get_pword('Re-Enter new password: ')
@@ -61,8 +60,7 @@ def logged_in(usr):
                         database.remove_user(usr)
                         logger.info(
                             'User {} Unregistered (to change password)', usr)
-                        enc_pass = hashlib.sha224(
-                            new_pass.encode('UTF-8')).hexdigest()
+                        enc_pass = static.encrypt(new_pass)
                         database.register_user(mail, usr, enc_pass, perm_level)
                         logger.info('User {} was registered with new password')
                         logger.debug(
@@ -201,7 +199,7 @@ def logged_in(usr):
                             perm_level = int(permission_lev)
                             if perm <= perm_level or perm == 0:
                                 # All conditions met, register user
-                                if database.register_user(mail, usr, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), perm_level):
+                                if database.register_user(mail, usr, static.encrypt(pword), perm_level):
                                     logger.info(
                                         'Registered new user, name: {}'.format(usr))
                                     print('\nRegistered successfully')
@@ -508,7 +506,7 @@ def register():
                     if static.check_password_requirements(pword):
                         logger.debug('password requirements confirmed')
                         # All conditions met, register user
-                        if database.register_user(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
+                        if database.register_user(mail, usr_name, static.encrypt(pword), 3):
                             logger.info(
                                 'Registered new user, name: {}'.format(usr_name))
                             print('\nRegistered successfully')
@@ -570,7 +568,7 @@ def login():
         logger.info('logging-in aborted')
         main()
     pword = pword_mod.get_pword('State your password: ')
-    pword_enc = hashlib.sha224(pword.encode('UTF-8')).hexdigest()
+    pword_enc = static.encrypt(pword)
     # Send username with encrypted password for verify
     if database.account_exists(usr_name, pword_enc):
         # User exists
@@ -594,8 +592,8 @@ def login():
 def default_user(enabled=True, pword='admin'):
     if enabled:
         if database.username_aviable('admin') is True:
-            database.register_user('None set', 'admin', hashlib.sha224(
-                pword.encode('UTF-8')).hexdigest(), 1)
+            database.register_user('None set', 'admin',
+                                   static.encrypt(pword), 1)
 
 
 @logger.catch

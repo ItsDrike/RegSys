@@ -1,3 +1,4 @@
+import hashlib
 import os
 import re
 from importlib import import_module
@@ -99,6 +100,18 @@ def check_mail(mail):
     else:
         logger.debug(f'Email format {mail} incorrect')
         return False
+
+
+def encrypt(pword):
+    '''Encrypt password using hashlibs SHA224 hash
+
+    Arguments:
+        pword {string} -- Plain password
+
+    Returns:
+        string -- Encrypted password
+    '''
+    return hashlib.sha224(pword.encode('UTF-8')).hexdigest()
 
 
 logger = import_module('RegSys').logger
