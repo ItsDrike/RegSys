@@ -2,7 +2,6 @@ from pathlib import Path
 from importlib import import_module
 import sqlite3
 
-
 logger = import_module('RegSys').logger
 
 
@@ -89,31 +88,6 @@ def remove_user(usr, DATABASE='database.db'):
     logger.trace('user removed')
 
 
-def get_user(usr, DATABASE='database.db'):
-    # TODO: Add documentation for return value type
-    '''Get User data from database
-
-    Arguments:
-        usr {string} -- Username
-
-    Keyword Arguments:
-        DATABASE {string} -- Path to satabase file (default: {'database.db'})
-
-    Returns:
-        [type] -- User data
-    '''
-    create()
-    logger.debug('finding user {} details to change permission level', usr)
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=:usr_name",
-              {'usr_name': usr})
-    fetch = c.fetchone()
-    conn.commit()
-    conn.close()
-    return fetch
-
-
 def register_user(mail, usr, pw, perms, DATABASE='database.db'):
     '''Register new user
 
@@ -144,6 +118,88 @@ def register_user(mail, usr, pw, perms, DATABASE='database.db'):
     except Exception as e:
         logger.error('unable to register user {} -> {}', usr, e)
         return False
+
+
+def get_user(usr, DATABASE='database.db'):
+    # TODO: Add documentation for return value type
+    '''Get User data from database
+
+    Arguments:
+        usr {string} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to satabase file (default: {'database.db'})
+
+    Returns:
+        [type] -- User data
+    '''
+    create()
+    logger.debug(f'finding user details of {usr}')
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE username=:usr_name",
+              {'usr_name': usr})
+    fetch = c.fetchone()
+    conn.commit()
+    conn.close()
+    return fetch
+
+
+def get_pass(usr, DATABASE='database.db'):
+    '''Get password (encrypted) for specified user
+
+    Arguments:
+        usr {string} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        string -- Encrypted password
+    '''
+    logger.trace(f'finding password for {usr}')
+    if username_aviable(usr):
+        fetch = get_user(usr, DATABASE)
+        logger.trace(f'password for user {usr} found: {fetch[2]}')
+        return fetch[2]
+    else:
+        logger.debug(f'password for user {usr} not found: No such user')
+        return ''
+
+
+def get_mail(usr, DATABASE='database.db'):
+    '''Get E-Mail Address for specified user
+
+    Arguments:
+        usr {string} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        string -- E-Mail Address
+    '''
+    logger.debug(f'finding email for {usr}')
+    fetch = get_user(usr, DATABASE)
+    logger.debug(f'email address for {usr} found: {fetch[0]}')
+    return fetch[0]
+
+
+def get_permissions(usr, DATABASE='database.db'):
+    # TODO: Add documentation for return value type
+    '''Get Permission level of specified user
+
+    Arguments:
+        usr {string} -- Username
+
+    Returns:
+        [type] -- Permission level
+    '''
+    logger.debug('finding permission level for {}', usr)
+    fetch = get_user(usr, DATABASE)
+    permlvl = fetch[3]
+    logger.debug('permission level found: {}', permlvl)
+    return permlvl
 
 
 def update_user_permissions(usr, perm, DATABASE='database.db'):
@@ -178,3 +234,52 @@ def update_user_permissions(usr, perm, DATABASE='database.db'):
     # register extracted user back, with different permission
     register_user(mail, usr, pw, perm)
     logger.debug('permission level changed successfully')
+
+
+def username_aviable(usr, DATABASE='database.db'):
+    '''Check if specified username is aviable
+
+    Arguments:
+        usr {string} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        bool -- Username aviability
+    '''
+    logger.trace('checking username availability')
+    fetch = get_user(usr, DATABASE)
+    if type(fetch) == tuple:
+        # User found, return False
+        logger.debug(f'Username {usr} taken')
+        return False
+    else:
+        # No such user, return True
+        return True
+    logger.debug(f'Username {usr} available')
+
+
+def account_exists(usr, pw, DATABASE='DATABASE.db'):
+    '''Check if there is an account with specified Username and Password
+
+    Arguments:
+        usr {string} -- Username
+        pw {string} -- Encrypted Password
+
+    Returns:
+        bool -- Account Exists
+    '''
+    logger.debug('verifying username and password for logging-in')
+
+    if username_aviable(usr):
+        pword = get_pass(usr)
+        if pword == pw:
+            logger.debug(f'user verification confirmed (name: {usr})')
+            return True
+        else:
+            logger.debug(f'user verification failed (name: {usr})')
+            return False
+    else:
+        logger.debug(f'user verification failed (name: {usr})')
+        return False

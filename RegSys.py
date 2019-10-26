@@ -1,11 +1,10 @@
 import hashlib
 import os
-import re
-import sqlite3
 import sys
 from loguru import logger
 import main.static as static
 import main.database as database
+import main.interface as interface
 
 import pword_mod
 
@@ -27,122 +26,13 @@ if not see_logs:
 
 def logged_in(usr):
     """User-side for Logged-In"""
-    def get_pass(usr):
-        """Get encrypted password from username in database"""
-        logger.debug('finding password for {}', usr)
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name",
-                  {'usr_name': usr})
-        fetch = c.fetchone()
-        conn.commit()
-        conn.close()
-        logger.debug('password found: {}', fetch[2])
-        return fetch[2]
-
-    def get_mail(usr):
-        """Get email address from username in database"""
-        logger.debug('finding email for {}', usr)
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name",
-                  {'usr_name': usr})
-        fetch = c.fetchone()
-        conn.commit()
-        conn.close()
-        logger.debug('email address found: {}', fetch[0])
-        return fetch[0]
-
-    def get_perm_level(usr):
-        """Get encrypted password from username in database"""
-        logger.debug('finding permission level for {}', usr)
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name",
-                  {'usr_name': usr})
-        fetch = c.fetchone()
-        conn.commit()
-        conn.close()
-        permlvl = fetch[3]
-        logger.debug('permission level found: {}', permlvl)
-        return permlvl
-
-    def perm_lvl_readable(permlvl):
-        val = 'unknown'
-        if permlvl == 3:
-            val = 'user'
-        elif permlvl == 2:
-            val = 'admin'
-        elif permlvl == 1:
-            val = 'superadmin'
-        elif permlvl == 0:
-            val = 'developer'
-        logger.debug('level interpreted as: {}', val)
-        return val
-
     # TODO: Add close account option
-
-    def maxlevel():
-        logger.debug('Showing maxlevel options')
-        print(f' ->1: Create new user')
-        print(f' ->2: Remove existing user')
-        print(f' ->3: Edit existing user')
-        print(f' ->4: Change your E-Mail address')
-        print(f' ->5: Change your password')
-        print(f' ->6: Python DeveloperShell')
-        print(f' ->7: Log-out')
-
-    def superadmin():
-        logger.debug('Showing superadmin options')
-        print(f' ->1: Create new user')
-        print(f' ->2: Remove existing user')
-        print(f' ->3: Edit existing user')
-        print(f' ->4: Change your E-Mail address')
-        print(f' ->5: Change your password')
-        print(f' ->6: Log-out')
-
-    def admin():
-        logger.debug('Showing admin options')
-        print(f' ->1: Create new user')
-        print(f' ->2: Remove existing user')
-        print(f' ->3: Edit existing user')
-        print(f' ->4: Change your E-Mail address')
-        print(f' ->5: Change your password')
-        print(f' ->6: Log-out')
-
-    def user():
-        logger.debug('Showing user options')
-        print(f' ->1: Change E-Mail address')
-        print(f' ->2: Change password')
-        print(f' ->3: Log-out')
 
     def change_pwd(override=False):
         """Change password of logged user"""
         logger.debug('trying to change password of {}', usr)
         os.system('cls')
         print('-Change password-')
-
-        def check_pword(pw):
-            """Check base requirements for password"""
-            logger.debug('checking password requirements')
-            rules = [
-                # must have at least one uppercase
-                lambda s: any(x.isupper() for x in s),
-                # must have at least one lowercase
-                lambda s: any(x.islower() for x in s),
-                lambda s: any(x.isdigit()
-                              for x in s),  # must have at least one digit
-                # must be at least 7 characters
-                lambda s: len(s) >= 7
-            ]
-            if all(rule(pw) for rule in rules):
-                # All rules passed
-                logger.debug('pass requirements met')
-                return True
-            else:
-                # Rule/s not passed
-                logger.debug('pass requirements not met')
-                return False
 
         if not override:
             inp = input(
@@ -158,16 +48,16 @@ def logged_in(usr):
                 logger.debug('Overriding old_pass entry')
                 print('')
                 old_pass = ''
-            if hashlib.sha224(old_pass.encode('UTF-8')).hexdigest() == get_pass(usr) or override:
+            if hashlib.sha224(old_pass.encode('UTF-8')).hexdigest() == database.get_pass(usr) or override:
                 logger.debug('Old password is correct (or override is ON)')
                 new_pass = pword_mod.get_pword('Enter new password: ')
                 new_pass2 = pword_mod.get_pword('Re-Enter new password: ')
                 if new_pass == new_pass2:
                     logger.debug('New passwords are matching')
-                    if check_pword(new_pass):
+                    if static.check_password_requirements(new_pass):
                         logger.debug('Password requirements are met')
-                        mail = get_mail(usr)
-                        perm_level = get_perm_level(usr)
+                        mail = database.get_mail(usr)
+                        perm_level = database.get_permissions(usr)
                         database.remove_user(usr)
                         logger.info(
                             'User {} Unregistered (to change password)', usr)
@@ -230,38 +120,18 @@ def logged_in(usr):
         logger.debug('Remove user function')
         os.system('cls')
         print(
-            f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} User Management-')
-
-        def check_usr(usr):
-            """Check if username exists in database"""
-            logger.debug('checking username availability')
-            database.create()
-            conn = sqlite3.connect(DATABASE)
-            c = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username=:usr_name",
-                      {'usr_name': usr})
-            fetch = c.fetchone()
-            conn.commit()
-            conn.close()
-            if type(fetch) == tuple:
-                # User found, return False
-                logger.debug('username taken')
-                return False
-            else:
-                # No such user, return True
-                return True
-            logger.debug('username available')
+            f'-{static.readable_permission(perm)[0].upper()+static.readable_permission(perm)[1:]} User Management-')
 
         usr_del = input('Please enter username: ')
         if usr_del == '*':
             logger.debug('user-removal aborted')
             main_log()
-        if not check_usr(usr_del):
+        if not database.username_aviable(usr_del):
             # Username exists
             logger.debug('Username {} is linked with an account', usr_del)
-            mail = get_mail(usr_del)
-            permission = get_perm_level(usr_del)
-            perms = perm_lvl_readable(permission)
+            mail = database.get_mail(usr_del)
+            permission = database.get_permissions(usr_del)
+            perms = static.readable_permission(permission)
             print(
                 f'\nAccount found:\n   Username: {usr_del}\n   Registered E-Mail Address: {mail}\n   Permission: {perms} ({permission})')
             inp = input(
@@ -279,7 +149,8 @@ def logged_in(usr):
                 else:
                     print(
                         'Your permission level in insufficient to remove {perms} type account.')
-                    logger.debug('Insufficient permission level ({}) to remove {}({}) type account', perm, perms, permission)
+                    logger.debug(
+                        'Insufficient permission level ({}) to remove {}({}) type account', perm, perms, permission)
                     input('Press Enter to continue..')
                     main_log()
             else:
@@ -296,66 +167,7 @@ def logged_in(usr):
         logger.debug('Create user function')
         os.system('cls')
         print(
-            f'-{perm_lvl_readable(perm)[0].upper()+perm_lvl_readable(perm)[1:]} Register-')
-
-        def check_usr(usr):
-            """Check if username exists in database"""
-            logger.debug('checking username availability')
-            database.create()
-            conn = sqlite3.connect(DATABASE)
-            c = conn.cursor()
-            c.execute("SELECT * FROM users WHERE username=:usr_name",
-                      {'usr_name': usr})
-            fetch = c.fetchone()
-            conn.commit()
-            conn.close()
-            if type(fetch) == tuple:
-                # User found, return False
-                logger.debug('username taken')
-                return False
-            else:
-                # No such user, return True
-                return True
-            logger.debug('username available')
-
-        def check_pword(pw):
-            """Check base requirements for password"""
-            logger.debug('checking password requirements')
-            rules = [
-                # must have at least one uppercase
-                lambda s: any(x.isupper() for x in s),
-                # must have at least one lowercase
-                lambda s: any(x.islower() for x in s),
-                lambda s: any(x.isdigit()
-                              for x in s),  # must have at least one digit
-                # must be at least 7 characters
-                lambda s: len(s) >= 7
-            ]
-            if all(rule(pw) for rule in rules):
-                # All rules passed
-                logger.debug('pass requirements met')
-                return True
-            else:
-                # Rule/s not passed
-                logger.debug('pass requirements not met')
-                return False
-
-        def check_mail(mail):
-            """Check if email format is correct"""
-            logger.debug('checking email format')
-            if re.match(r'[^@]+@[^@]+\.[^@]', mail):
-                logger.debug('email format correct')
-                return True
-            else:
-                logger.debug('email format incorrect')
-                return False
-            if not usr:
-                usr = input('Enter username: ').lower()
-            logger.debug('trying to create account, username: {}'.format(usr))
-            if usr == '*':
-                logger.debug('leaving function (*)')
-                os.system('cls')
-                main_log()
+            f'-{static.readable_permission(perm)[0].upper()+static.readable_permission(perm)[1:]} Register-')
 
         if not usr:
             usr = input('Enter username: ')
@@ -365,7 +177,7 @@ def logged_in(usr):
         if usr == '*':
             main_log()
 
-        if check_usr(usr) is True:
+        if database.username_aviable(usr) is True:
             if not mail:
                 mail = input('Enter your email address: ').lower()
                 # If mail is * go back
@@ -375,15 +187,14 @@ def logged_in(usr):
             else:
                 print(f'E-Mail Address: {mail}')
             # Check if the email address format is correct
-            mail_valid = check_mail(mail)
-            if mail_valid:
+            if static.check_mail(mail):
                 pword = pword_mod.get_pword('Enter password: ')
                 pword_rep = pword_mod.get_pword('Re-Enter password: ')
                 # Check if passwords match
                 if pword == pword_rep:
                     logger.debug('password match confirmed')
                     # Check if password meets the requirements
-                    if check_pword(pword):
+                    if static.check_password_requirements(pword):
                         logger.debug('password requirements confirmed')
                         permission_lev = input('Enter permission level: ')
                         if static.is_number(permission_lev):
@@ -457,7 +268,7 @@ def logged_in(usr):
             cnfrm = input('Y/N: ')
             if cnfrm.lower() == 'y':
                 logger.debug('Username override confirmed')
-                perms = get_perm_level(usr)
+                perms = database.get_permissions(usr)
                 if perms > perm:
                     logger.debug(
                         'Override successfull, permission level is sufficient')
@@ -471,7 +282,8 @@ def logged_in(usr):
                 else:
                     logger.debug(
                         'Override function failed, permission level is not sufficient')
-                    perms = perm_lvl_readable(get_perm_level(usr))
+                    perms = static.readable_permission(
+                        database.get_permissions(usr))
                     print(
                         f'Sorry, your permission level is not sufficient do delete {perms} type account')
                     input('\nPress Enter to continue..')
@@ -647,14 +459,14 @@ def logged_in(usr):
         logger.debug('Logged as {}', usr)
         os.system('cls')
         print(f'-Welcome {usr}-\n')
-        pw = get_pass(usr)
-        mail = get_mail(usr)
+        pw = database.get_pass(usr)
+        mail = database.get_mail(usr)
         if perms:
             permlvl = perms
-            perm = perm_lvl_readable(permlvl)
+            perm = static.readable_permission(permlvl)
         else:
-            permlvl = get_perm_level(usr)
-            perm = perm_lvl_readable(permlvl)
+            permlvl = database.get_permissions(usr)
+            perm = static.readable_permission(permlvl)
 
         print(f'(Your current E-Mail: {mail})')
         if perms:
@@ -664,18 +476,7 @@ def logged_in(usr):
             print(f'(Your permission level: {perm})')
         print(f'(Your Encrypted password: {pw})\n')
 
-        # * Permission level
-        if permlvl == 0:
-            maxlevel()
-        # SuperAdmin permission level
-        elif permlvl == 1:
-            superadmin()
-        # Admin permission level
-        elif permlvl == 2:
-            admin()
-        # User permission level
-        elif permlvl == 3:
-            user()
+        interface.show_menu(permlvl)
         get_inputs(permlvl)
 
     main_log()
@@ -683,159 +484,83 @@ def logged_in(usr):
 
 def register():
     """Main register function"""
-    def check_usr(usr):
-        """Check if username exists in database"""
-        logger.debug('checking username availability')
-        database.create()
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name",
-                  {'usr_name': usr})
-        fetch = c.fetchone()
-        conn.commit()
-        conn.close()
-        if type(fetch) == tuple:
-            # User found, return False
-            logger.debug('username taken')
-            return False
-        else:
-            # No such user, return True
-            logger.debug('username available')
-            return True
-
-    def check_pword(pw):
-        """Check base requirements for password"""
-        logger.debug('checking password requirements')
-        rules = [
-            # must have at least one uppercase
-            lambda s: any(x.isupper() for x in s),
-            # must have at least one lowercase
-            lambda s: any(x.islower() for x in s),
-            lambda s: any(x.isdigit()
-                          for x in s),  # must have at least one digit
-            # must be at least 7 characters
-            lambda s: len(s) >= 7
-        ]
-        if all(rule(pw) for rule in rules):
-            # All rules passed
-            logger.debug('pass requirements met')
-            return True
-        else:
-            # Rule/s not passed
-            logger.debug('pass requirements not met')
-            return False
-
-    def check_mail(mail):
-        """Check if email format is correct"""
-        logger.debug('checking email format')
-        if re.match(r'[^@]+@[^@]+\.[^@]', mail):
-            logger.debug('email format correct')
-            return True
-        else:
-            logger.debug('email format incorrect')
-            return False
-
-    def reg():
-        """User-side for register"""
-        logger.debug('registration process started')
-        print('-Register-')
-        mail = input('Enter your email address: ').lower()
-        # If mail is * go back
-        if mail == '*':
-            logger.info('registration aborted')
-            main()
-        else:
-            # Check if the email address format is correct
-            mail_valid = check_mail(mail)
-            if mail_valid:
-                usr_name = input('Enter your new username: ').lower()
-                # Check if the username is available
-                usr_valid = check_usr(usr_name)
-                if usr_valid:
-                    logger.debug('registration username valid')
-                    pword = pword_mod.get_pword('Enter password: ')
-                    pword_rep = pword_mod.get_pword('Re-Enter password: ')
-                    # Check if passwords match
-                    if pword == pword_rep:
-                        logger.debug('password match confirmed')
-                        # Check if password meets the requirements
-                        if check_pword(pword):
-                            logger.debug('password requirements confirmed')
-                            # All conditions met, register user
-                            if database.register_user(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
-                                logger.info(
-                                    'Registered new user, name: {}'.format(usr_name))
-                                print('\nRegistered successfully')
-                                input('Press Enter to continue...')
-                                os.system('cls')
-                                main()
-                            else:
-                                # In case of failure in database.register_user()
-                                logger.error(
-                                    'Register encryption function failed')
-                                print(
-                                    '\nRegister failed, please see log details ({})', LOG_FILE)
-                                print(
-                                    'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
-                                input('Press Enter to continue...')
-                                os.system('cls')
-                                main()
-                        else:
-                            # In case password does not meet requirements
-                            logger.debug('password requirements not met')
-                            print(
-                                '\nPassword does not meet requirements. Must contain at least:')
-                            print(
-                                '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
-                            input('Press Enter to continue..')
+    logger.debug('registration process started')
+    print('-Register-')
+    mail = input('Enter your email address: ').lower()
+    # If mail is * go back
+    if mail == '*':
+        logger.info('registration aborted')
+        main()
+    else:
+        # Check if the email address format is correct
+        if static.check_mail(mail):
+            usr_name = input('Enter your new username: ').lower()
+            # Check if the username is available
+            usr_valid = database.username_aviable(usr_name)
+            if usr_valid:
+                logger.debug('registration username valid')
+                pword = pword_mod.get_pword('Enter password: ')
+                pword_rep = pword_mod.get_pword('Re-Enter password: ')
+                # Check if passwords match
+                if pword == pword_rep:
+                    logger.debug('password match confirmed')
+                    # Check if password meets the requirements
+                    if static.check_password_requirements(pword):
+                        logger.debug('password requirements confirmed')
+                        # All conditions met, register user
+                        if database.register_user(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
+                            logger.info(
+                                'Registered new user, name: {}'.format(usr_name))
+                            print('\nRegistered successfully')
+                            input('Press Enter to continue...')
                             os.system('cls')
-                            reg()
+                            main()
+                        else:
+                            # In case of failure in database.register_user()
+                            logger.error(
+                                'Register encryption function failed')
+                            print(
+                                '\nRegister failed, please see log details ({})', LOG_FILE)
+                            print(
+                                'In case you are unable to figure out how to fix this issue, please send logfile to the developer')
+                            input('Press Enter to continue...')
+                            os.system('cls')
+                            main()
                     else:
-                        # In case passwords does not match
-                        logger.debug('passwords does not match')
-                        print('\nPasswords does not match')
+                        # In case password does not meet requirements
+                        logger.debug('password requirements not met')
+                        print(
+                            '\nPassword does not meet requirements. Must contain at least:')
+                        print(
+                            '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
                         input('Press Enter to continue..')
                         os.system('cls')
-                        reg()
-
+                        register()
                 else:
-                    # Username is already taken
-                    logger.debug('registration username invalid (taken)')
-                    print('\nThis username is not available')
+                    # In case passwords does not match
+                    logger.debug('passwords does not match')
+                    print('\nPasswords does not match')
                     input('Press Enter to continue..')
                     os.system('cls')
-                    reg()
+                    register()
+
             else:
-                logger.debug('registration email format invalid')
-                print('\nEmail format is invalid (___@___.___)')
+                # Username is already taken
+                logger.debug('registration username invalid (taken)')
+                print('\nThis username is not available')
                 input('Press Enter to continue..')
                 os.system('cls')
-                reg()
-    reg()
+                register()
+        else:
+            logger.debug('registration email format invalid')
+            print('\nEmail format is invalid (___@___.___)')
+            input('Press Enter to continue..')
+            os.system('cls')
+            register()
 
 
 def login():
     """Main login function"""
-    def verify(usr, pw):
-        """Check if user with entered name and pass exists in database"""
-        logger.debug('verifying username and password for logging-in')
-        database.create()
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=:usr_name AND password=:pword",
-                  {'usr_name': usr, 'pword': pw})
-        fetch = c.fetchone()
-        conn.commit()
-        conn.close()
-        if type(fetch) == tuple:
-            # User with entered specs found, return True
-            logger.debug('user verification confirmed (name: {})', usr)
-            return True
-        else:
-            # User with entered specs not found, return False
-            logger.debug('user verification failed (name: {})', usr)
-            return False
-
     def log():
         """User-side for login"""
         logger.debug('logging-in process started')
@@ -848,7 +573,7 @@ def login():
         pword = pword_mod.get_pword('State your password: ')
         pword_enc = hashlib.sha224(pword.encode('UTF-8')).hexdigest()
         # Send username with encrypted password for verify
-        if verify(usr_name, pword_enc):
+        if database.account_exists(usr_name, pword_enc):
             # User exists
             logger.debug('user information confirmed, user exists')
             logger.info('user {} logged.', usr_name)
@@ -870,7 +595,7 @@ def login():
 
 def default_user(enabled=True, pword='admin'):
     if enabled:
-        if database.get_all_users('admin') is None:
+        if database.username_aviable('admin') is True:
             database.register_user('None set', 'admin', hashlib.sha224(
                 pword.encode('UTF-8')).hexdigest(), 1)
 
