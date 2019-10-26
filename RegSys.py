@@ -168,12 +168,12 @@ def logged_in(usr):
                         logger.debug('Password requirements are met')
                         mail = get_mail(usr)
                         perm_level = get_perm_level(usr)
-                        database.remove(usr)
+                        database.remove_user(usr)
                         logger.info(
                             'User {} Unregistered (to change password)', usr)
                         enc_pass = hashlib.sha224(
                             new_pass.encode('UTF-8')).hexdigest()
-                        database.file_register(mail, usr, enc_pass, perm_level)
+                        database.register_user(mail, usr, enc_pass, perm_level)
                         logger.info('User {} was registered with new password')
                         logger.debug(
                             'New encrypted password of {} is: {}', usr, enc_pass)
@@ -235,7 +235,7 @@ def logged_in(usr):
         def check_usr(usr):
             """Check if username exists in database"""
             logger.debug('checking username availability')
-            database.create_database()
+            database.create()
             conn = sqlite3.connect(DATABASE)
             c = conn.cursor()
             c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -272,7 +272,7 @@ def logged_in(usr):
                     logger.debug('Permissions checked')
                     logger.info(
                         'User {} has been unregistered by {} (higher-perm-user-confirmed)', usr_del, usr)
-                    database.remove(usr_del)
+                    database.remove_user(usr_del)
                     print(f'User {usr_del} (type: {perms}) was unregistered')
                     input('Press Enter to continue..')
                     main_log()
@@ -301,7 +301,7 @@ def logged_in(usr):
         def check_usr(usr):
             """Check if username exists in database"""
             logger.debug('checking username availability')
-            database.create_database()
+            database.create()
             conn = sqlite3.connect(DATABASE)
             c = conn.cursor()
             c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -390,7 +390,7 @@ def logged_in(usr):
                             perm_level = int(permission_lev)
                             if perm <= perm_level or perm == 0:
                                 # All conditions met, register user
-                                if database.file_register(mail, usr, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), perm_level):
+                                if database.register_user(mail, usr, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), perm_level):
                                     logger.info(
                                         'Registered new user, name: {}'.format(usr))
                                     print('\nRegistered successfully')
@@ -398,7 +398,7 @@ def logged_in(usr):
                                     os.system('cls')
                                     main_log()
                                 else:
-                                    # In case of failure in database.file_register()
+                                    # In case of failure in database.register_user()
                                     logger.error(
                                         'Register encryption function failed')
                                     print(
@@ -461,7 +461,7 @@ def logged_in(usr):
                 if perms > perm:
                     logger.debug(
                         'Override successfull, permission level is sufficient')
-                    database.remove(usr)
+                    database.remove_user(usr)
                     logger.info(
                         'Unregistering {}, his perm level was: {}; user removed by: {}, with perm level: {}', usr, perms, usr, perm)
                     print(
@@ -686,7 +686,7 @@ def register():
     def check_usr(usr):
         """Check if username exists in database"""
         logger.debug('checking username availability')
-        database.create_database()
+        database.create()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -762,7 +762,7 @@ def register():
                         if check_pword(pword):
                             logger.debug('password requirements confirmed')
                             # All conditions met, register user
-                            if database.file_register(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
+                            if database.register_user(mail, usr_name, hashlib.sha224(pword.encode('UTF-8')).hexdigest(), 3):
                                 logger.info(
                                     'Registered new user, name: {}'.format(usr_name))
                                 print('\nRegistered successfully')
@@ -770,7 +770,7 @@ def register():
                                 os.system('cls')
                                 main()
                             else:
-                                # In case of failure in database.file_register()
+                                # In case of failure in database.register_user()
                                 logger.error(
                                     'Register encryption function failed')
                                 print(
@@ -819,7 +819,7 @@ def login():
     def verify(usr, pw):
         """Check if user with entered name and pass exists in database"""
         logger.debug('verifying username and password for logging-in')
-        database.create_database()
+        database.create()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=:usr_name AND password=:pword",
@@ -870,8 +870,8 @@ def login():
 
 def default_user(enabled=True, pword='admin'):
     if enabled:
-        if database.get_data('admin') is None:
-            database.file_register('None set', 'admin', hashlib.sha224(
+        if database.get_all_users('admin') is None:
+            database.register_user('None set', 'admin', hashlib.sha224(
                 pword.encode('UTF-8')).hexdigest(), 1)
 
 
@@ -917,7 +917,7 @@ def main():
 if __name__ == '__main__':
     logger.info('Program started directly')
     try:
-        default_user()
+        default_user(False)
         main()
     except Exception as e:
         logger.exception('-Main exception-')

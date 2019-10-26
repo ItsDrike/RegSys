@@ -6,9 +6,16 @@ import sqlite3
 logger = import_module('RegSys').logger
 
 
-def create_database(DATABASE='database.db'):
-    """Check if database exists, if not, create one"""
-    logger.debug('Checking if database tables exists')
+def create(DATABASE='database.db'):
+    '''Check for database existence
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        boolean -- Database created
+    '''
+    logger.trace('Checking if database exists')
     if not Path(DATABASE).is_file():
         logger.warning('Database does not exists, creating new database')
         conn = sqlite3.connect(DATABASE)
@@ -21,48 +28,81 @@ def create_database(DATABASE='database.db'):
             )""")
         conn.commit()
         conn.close()
-        return None
+        return True
     else:
-        logger.debug('Database exists.')
-        return None
+        logger.trace('Database exists, no action required.')
+        return False
 
 
-def get_tables(DATABASE='database.db'):
-    """Will return all saved info"""
-    logger.debug('Accessing all database tables')
-    create_database()
+def get_all_users(DATABASE='database.db'):
+    # TODO: Add documentation for return value type
+    '''Returns all saved users
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        [type] -- Database table dump
+    '''
+    logger.trace('Accessing all database tables')
+    create()
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("SELECT * FROM users")
     data = c.fetchall()
     conn.commit()
     conn.close()
-    logger.debug('Database tables returned, data: {}', data)
+    logger.trace(f'Database tables returned, data: {data}')
     return data
 
 
-def delete_table(DATABASE='database.db'):
-    logger.info('removing whole database table')
+def delete_all_users(DATABASE='database.db'):
+    '''Removes all users in database
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+    '''
+    logger.warning('Removing all users from database')
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM users")
     conn.commit()
     conn.close()
-    logger.debug('Whole database was deleted')
+    logger.trace('Removed all users from database')
 
 
-def remove(usr, DATABASE='database.db'):
-    logger.info('removing user {} from database', usr)
+def remove_user(usr, DATABASE='database.db'):
+    '''Removes specified user from database
+
+    Arguments:
+        usr {stringf} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+    '''
+    logger.debug('removing user {} from database', usr)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM users WHERE username=:usr_name", {'usr_name': usr})
     conn.commit()
     conn.close()
-    logger.debug('user removed')
+    logger.trace('user removed')
 
 
-def get_data(usr, DATABASE='database.db'):
-    create_database()
+def get_user(usr, DATABASE='database.db'):
+    # TODO: Add documentation for return value type
+    '''Get User data from database
+
+    Arguments:
+        usr {string} -- Username
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to satabase file (default: {'database.db'})
+
+    Returns:
+        [type] -- User data
+    '''
+    create()
     logger.debug('finding user {} details to change permission level', usr)
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -74,12 +114,25 @@ def get_data(usr, DATABASE='database.db'):
     return fetch
 
 
-def file_register(mail, usr, pw, perms, DATABASE='database.db'):
-    """Register new user into database file"""
+def register_user(mail, usr, pw, perms, DATABASE='database.db'):
+    '''Register new user
+
+    Arguments:
+        mail {string} -- Users E-Mail address
+        usr {string} -- Username
+        pw {string} -- Encrypted password
+        perms {string} -- Permission level
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database file (default: {'database.db'})
+
+    Returns:
+        boolean -- User registered
+    '''
     logger.debug(
         'adding user to database - mail: {} ; usr: {} ; enc_pwd: {} ; perms: {}', mail, usr, pw, perms)
     try:
-        create_database()
+        create()
         conn = sqlite3.connect(DATABASE)
         c = conn.cursor()
         c.execute("INSERT INTO users VALUES(:email, :username, :password, :permlevel)", {
@@ -93,11 +146,19 @@ def file_register(mail, usr, pw, perms, DATABASE='database.db'):
         return False
 
 
-def change_perm_level(usr, perm, DATABASE='database.db'):
-    """Change permission level of specified user"""
+def update_user_permissions(usr, perm, DATABASE='database.db'):
+    '''Update permission level of specified user
+
+    Arguments:
+        usr {string} -- Username
+        perm {string} -- Permission level
+
+    Keyword Arguments:
+        DATABASE {string} -- Path to database fle (default: {'database.db'})
+    '''
     logger.debug('changing permission level of user {}, to {}', usr, perm)
     # Get database data, to be able to register new user under same data (with changed permission level)
-    fetch = get_data(usr)
+    fetch = get_user(usr)
     # extract database data to multiple vars
     curpermlvl = fetch[3]
     mail = fetch[0]
@@ -112,9 +173,8 @@ def change_perm_level(usr, perm, DATABASE='database.db'):
     else:
         logger.debug(
             'found user info: (usr: {}, mail: {}, enc-pw: {}, perms: {}) --> PERMS EQUAL')
-        return None
     # unregister extracted user
     remove(usr, DATABASE)
     # register extracted user back, with different permission
-    file_register(mail, usr, pw, perm)
+    register_user(mail, usr, pw, perm)
     logger.debug('permission level changed successfully')
