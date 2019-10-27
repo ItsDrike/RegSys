@@ -3,6 +3,7 @@ from importlib import import_module
 import sqlite3
 
 logger = import_module('RegSys').logger
+static = import_module('RegSys').static
 
 
 def create(DATABASE='database.db'):
@@ -103,7 +104,7 @@ def register_user(mail, usr, pw, perms, DATABASE='database.db'):
     Returns:
         boolean -- User registered
     '''
-    logger.debug(
+    logger.trace(
         'adding user to database - mail: {} ; usr: {} ; enc_pwd: {} ; perms: {}', mail, usr, pw, perms)
     try:
         create()
@@ -117,6 +118,7 @@ def register_user(mail, usr, pw, perms, DATABASE='database.db'):
         return True
     except Exception as e:
         logger.error('unable to register user {} -> {}', usr, e)
+        raise(static.RegistrationError('User registration failed'))
         return False
 
 
@@ -134,7 +136,7 @@ def get_user(usr, DATABASE='database.db'):
         [type] -- User data
     '''
     create()
-    logger.debug(f'finding user details of {usr}')
+    logger.trace(f'finding user details of {usr}')
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE username=:usr_name",
@@ -158,7 +160,7 @@ def get_pass(usr, DATABASE='database.db'):
         string -- Encrypted password
     '''
     logger.trace(f'finding password for {usr}')
-    if username_aviable(usr):
+    if not username_aviable(usr):
         fetch = get_user(usr, DATABASE)
         logger.trace(f'password for user {usr} found: {fetch[2]}')
         return fetch[2]
@@ -252,12 +254,13 @@ def username_aviable(usr, DATABASE='database.db'):
     fetch = get_user(usr, DATABASE)
     if type(fetch) == tuple:
         # User found, return False
-        logger.debug(f'Username {usr} taken')
+        logger.trace(f'Username {usr} taken')
         return False
     else:
         # No such user, return True
+        # TODO: Match against a list of protected usernames ('admin', 'dev', '', etc..)
         return True
-    logger.debug(f'Username {usr} available')
+    logger.trace(f'Username {usr} available')
 
 
 def account_exists(usr, pw, DATABASE='DATABASE.db'):
@@ -270,12 +273,12 @@ def account_exists(usr, pw, DATABASE='DATABASE.db'):
     Returns:
         bool -- Account Exists
     '''
-    logger.debug('verifying username and password for logging-in')
+    logger.trace('verifying username and password for logging-in')
 
-    if username_aviable(usr):
+    if not username_aviable(usr):
         pword = get_pass(usr)
         if pword == pw:
-            logger.debug(f'user verification confirmed (name: {usr})')
+            logger.trace(f'user verification confirmed (name: {usr})')
             return True
         else:
             logger.debug(f'user verification failed (name: {usr})')
@@ -283,3 +286,10 @@ def account_exists(usr, pw, DATABASE='DATABASE.db'):
     else:
         logger.debug(f'user verification failed (name: {usr})')
         return False
+
+
+def create_default_user(enabled=True, pword='admin', DATABASE='database.db'):
+    if enabled:
+        if username_aviable('admin', DATABASE) is True:
+            register_user('None set', 'admin',
+                          static.encrypt(pword), 1, DATABASE)

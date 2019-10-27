@@ -1,10 +1,13 @@
 import hashlib
 import os
 import re
-from importlib import import_module
 
 
 class GetOutOfLoop(Exception):
+    pass
+
+
+class RegistrationError(Exception):
     pass
 
 
@@ -50,7 +53,6 @@ def readable_permission(permlvl):
         val = 'superadmin'
     elif permlvl == 0:
         val = 'developer'
-    logger.trace(f'level interpreted as: {val}')
     return val
 
 
@@ -63,7 +65,6 @@ def check_password_requirements(pw):
     Returns:
         bool -- Password meets requirements
     '''
-    logger.trace('checking password requirements')
     rules = [
         # must have at least one uppercase
         lambda s: any(x.isupper() for x in s),
@@ -75,12 +76,8 @@ def check_password_requirements(pw):
         lambda s: len(s) >= 7
     ]
     if all(rule(pw) for rule in rules):
-        # All rules passed
-        logger.debug('pass requirements met')
         return True
     else:
-        # Rule/s not passed
-        logger.debug('pass requirements not met')
         return False
 
 
@@ -93,12 +90,9 @@ def check_mail(mail):
     Returns:
         bool -- Valid E-Mail Format
     '''
-    logger.trace('checking email format')
     if re.match(r'[^@]+@[^@]+\.[^@]', mail):
-        logger.debug(f'Email format {mail} correct')
         return True
     else:
-        logger.debug(f'Email format {mail} incorrect')
         return False
 
 
@@ -112,6 +106,3 @@ def encrypt(pword):
         string -- Encrypted password
     '''
     return hashlib.sha224(pword.encode('UTF-8')).hexdigest()
-
-
-logger = import_module('RegSys').logger
