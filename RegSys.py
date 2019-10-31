@@ -1,4 +1,3 @@
-import os
 from loguru import logger
 import main.static as static
 import main.database as database
@@ -47,8 +46,15 @@ def main():
     if prompt == '2':
         # Register
         logger.debug('choice: register (2)')
-        interface.user_register()
-        main()
+        usr = interface.user_register()
+        if usr:
+            logged = interface.user_login(usr=usr.username)
+            if logged:
+                logged_in(logged)
+            else:
+                main()
+        else:
+            main()
     elif prompt == '1':
         # Log In
         logger.debug('choice: login (1)')

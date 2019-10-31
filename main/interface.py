@@ -86,7 +86,7 @@ def user_login(clear=True, usr=None, DATABASE='database.db'):
         pword = get_pword('State your password: ')
     else:
         usr_name = usr
-        pword = get_pword(f'Enter password for {usr}')
+        pword = get_pword(f'Enter password for {usr}: ')
     pword_enc = static.encrypt(pword)
 
     if database.account_exists(usr_name, pword_enc, DATABASE):
@@ -127,7 +127,7 @@ def user_register(clear=True, mail=None, usr=None):
         email = input('Enter your email address: ').lower()
         if email == '*':
             logger.info('registration aborted')
-            return False
+            return None
         if not static.check_mail(email):
             logger.debug(f'Email format {mail} incorrect')
             print('\nEmail format is invalid (___@___.___)')
@@ -163,7 +163,7 @@ def user_register(clear=True, mail=None, usr=None):
                 'Registered new user, name: {}'.format(usr_name))
             print('\nRegistered successfully')
             input('Press Enter to continue...')
-            return True
+            return LoggedUser(usr_name)
         else:
             invalid_password_requirements(clear)
             return user_register(clear, mail=email, usr=usr_name)
