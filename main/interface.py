@@ -30,13 +30,23 @@ def invalid_choice(clear=True):
         system('cls')
 
 
-def invalid_password_requirements(clear=True):
+def invalid_password_requirements(clear=True, enter=True):
     logger.debug('password requirements not met')
     print(
         '\nPassword does not meet requirements. Must contain at least:')
     print(
         '  1 Uppercase letter \n  1 Lowercase letter \n  1 Number \n  Minimum length of 7 characters')
-    input('Press Enter to continue..')
+    if enter:
+        input('Press Enter to continue..')
+    if clear:
+        system('cls')
+
+
+def invalid_email_format(clear=True, enter=True):
+    logger.debug(f'Email format incorrect')
+    print('\nEmail format is invalid (___@___.___)')
+    if enter:
+        input('Press Enter to continue..')
     if clear:
         system('cls')
 
@@ -129,9 +139,7 @@ def user_register(clear=True, mail=None, usr=None):
             logger.info('registration aborted')
             return None
         if not static.check_mail(email):
-            logger.debug(f'Email format {mail} incorrect')
-            print('\nEmail format is invalid (___@___.___)')
-            input('Press Enter to continue..')
+            invalid_email_format()
             return user_register(clear, usr=usr)
         else:
             logger.trace(f'Email format {mail} correct')
@@ -220,7 +228,7 @@ def dev_shell():
                         break
                 else:
                     logger.debug('Python DeveloperShell exit')
-                    raise static.GetOutOfLoop
+                    return False
             else:
                 continue
     except static.GetOutOfLoop:
@@ -238,6 +246,32 @@ class LoggedUser:
         if clear:
             system('cls')
 
+    def override_setting(self, minimum_permission, clear=True, enter=True):
+        print('\nDo you wish to override this setting?')
+        cnfrm = input('Y/N: ')
+        if cnfrm.lower() == 'y':
+            if self.permission <= minimum_permission:
+                logger.debug(
+                    'Override successfull, permission level is sufficient')
+                return True
+            else:
+                logger.debug(
+                    'Override not successfull, insufficient permission level')
+                print(
+                    'Your permission level is not sufficient to override this setting.')
+                if enter:
+                    input('Press enter to continue..')
+                return False
+        elif cnfrm.lower() == 'n':
+            return False
+        else:
+            if clear:
+                system('cls')
+            else:
+                print('Input not recognized, try again.')
+            self.override_setting(
+                minimum_permission, clear=clear)
+
     def show_menu(self, clear=True, perm=None, get_inputs=True):
         '''Show Menu for user with specified permission level
 
@@ -247,9 +281,11 @@ class LoggedUser:
             system('cls')
         print(f'-Welcome {self.username}-\n')
         print(f'(Your current E-Mail: {self.email})')
-        if perm is not None or self.permission > 3 or self.permission <= 0:
+        if perm is not None or self.permission > 3 or self.permission < 0:
             if perm is None:
                 perm = 3
+            logger.warning(
+                f'Permission level not detected, assigned temporal permission level {static.readable_permission(perm)} (initial permission level: {self.permission})')
             print(
                 f'(Your permission level: Temporal {static.readable_permission(perm)} - Contact developer for more info or create new account.)')
         else:
@@ -480,7 +516,7 @@ class LoggedUser:
             self.remove_user(clear)
 
     # TODO: Improve function
-    def create_user(self, clear=True, usr=None, mail=None):
+    def create_user(self, clear=True, usr=None, email=None, pw=None):
         """Create new user with specified data"""
         logger.debug('Create user function')
         if clear:
@@ -498,24 +534,30 @@ class LoggedUser:
             print(f'Username: {usr}')
 
         if database.username_aviable(usr):
-            if not mail:
-                mail = input('Enter your email address: ').lower()
+            if not email:
+                mail = input('Enter E-Mail address: ').lower()
                 # If mail is * go back
                 if mail == '*':
                     handle_user_abort()
                     return False
             else:
+                mail = email
                 print(f'E-Mail Address: {mail}')
             # Check if the email address format is correct
-            if static.check_mail(mail):
+            if static.check_mail(mail) or email:
                 logger.trace(f'Email format {mail} correct')
-                pword = get_pword('Enter password: ')
-                pword_rep = get_pword('Re-Enter password: ')
+                if not pw:
+                    pword = get_pword('Enter password: ')
+                    pword_rep = get_pword('Re-Enter password: ')
+                else:
+                    pword = pw
+                    pword_rep = pw
+                    print(f'Password: {len(pw) * "*"}')
                 # Check if passwords match
                 if pword == pword_rep:
                     logger.debug('password match confirmed')
                     # Check if password meets the requirements
-                    if static.check_password_requirements(pword):
+                    if static.check_password_requirements(pword) or pw:
                         logger.debug('password requirements confirmed')
                         permission_lev = input('Enter permission level: ')
                         if static.is_number(permission_lev):
@@ -552,8 +594,12 @@ class LoggedUser:
                             self.create_user(clear=clear, usr=usr, mail=mail)
                     else:
                         # In case password does not meet requirements
-                        invalid_password_requirements(clear=clear)
-                        self.create_user(clear=clear, usr=usr, mail=mail)
+                        invalid_password_requirements(clear=False, enter=False)
+                        if self.override_setting(1):
+                            self.create_user(
+                                clear=clear, usr=usr, email=mail, pw=pword)
+                        else:
+                            self.create_user(clear=clear, usr=usr, email=mail)
                 else:
                     # In case passwords does not match
                     logger.debug('passwords does not match')
@@ -563,42 +609,25 @@ class LoggedUser:
                         system('cls')
                     self.create_user(clear=clear, usr=usr, mail=mail)
             else:
-                logger.debug(f'Email format {mail} incorrect')
-                print('\nEmail format is invalid (___@___.___)')
-                input('Press Enter to continue..')
-                if clear:
-                    system('cls')
-                self.create_user(clear=clear, usr=usr)
+                invalid_email_format(clear=False, enter=False)
+                if self.override_setting(2):
+                    self.create_user(clear=clear, usr=usr, email=mail)
+                else:
+                    self.create_user(clear=clear, usr=usr)
+
         else:
             logger.debug('Username is taken')
-            print('\nThis username is not aviable, do you want to override this setting?')
-            cnfrm = input('Y/N: ')
-            if cnfrm.lower() == 'y':
-                logger.debug('Username override confirmed')
-                perms = database.get_permissions(usr)
-                if perms > self.permission:
-                    logger.debug(
-                        'Override successfull, permission level is sufficient')
-                    database.remove_user(usr)
-                    logger.info(
-                        'Unregistering {}, his perm level was: {}; user removed by: {}, with perm level: {}', usr, perms, usr, self.permission)
-                    print(
-                        f'User {usr} was unregistered, his perm level was: {perms}')
-                    input('\nPress Enter to continue..')
-                    self.create_user(clear=clear, usr=usr)
-                else:
-                    logger.debug(
-                        'Override function failed, permission level is not sufficient')
-                    perms = static.readable_permission(
-                        database.get_permissions(usr))
-                    print(
-                        f'Sorry, your permission level is not sufficient do delete {perms} type account')
-                    input('\nPress Enter to continue..')
-                    if clear:
-                        system('cls')
-                    return False
+            print('\nThis username is not aviable')
+            perms = database.get_permissions(usr)
+            if self.override_setting(perms):
+                database.remove_user(usr)
+                logger.info(
+                    'Unregistering {}, his perm level was: {}; user removed by: {}, with perm level: {}', usr, perms, usr, self.permission)
+                print(
+                    f'User {usr} was unregistered, his perm level was: {perms}')
+                input('\nPress Enter to continue..')
+                self.create_user(clear=clear, usr=usr)
             else:
-                handle_user_abort()
                 if clear:
                     system('cls')
                 return False
