@@ -1,5 +1,5 @@
 # A simple registration program
-This program is still highly WIP
+This program is still highly WIP and was made only for fun and educational purposes, it doesn't serve any real purpose.
 
 ## Usage
 This program was designed as simple login/register system
